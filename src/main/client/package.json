@@ -1,0 +1,21 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && rollup --config rollup.index.config.js && rollup --config rollup.app.config.js",
+    "build:css": "postcss styles/tailwind.css -o ../webapp/resources/css/main.css",
+    "watch:css": "postcss styles/tailwind.css -o ../webapp/resources/css/main.css --watch"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^9.8.0",
+    "cssnano": "^4.1.10",
+    "tailwindcss": "^1.4.6"
+  },
+  "devDependencies": {
+    "postcss-cli": "^7.1.1",
+    "rollup": "^2.10.9",
+    "typescript": "^3.9.3"
+  }
+}

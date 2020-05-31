@@ -1,0 +1,44 @@
+@tailwind base;
+
+@tailwind components;
+
+.header{
+    @apply w-full p-1 bg-blue-600 text-gray-200;
+}
+
+.transition-default{
+    transition: background-color .4s ease, color .4s ease;
+}
+
+.album-grid{
+    display: grid;
+    grid-gap: .5rem;
+    place-content: center;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(300px, .25fr));
+}
+
+.image-grid{
+    display: grid;
+    grid-gap: .5rem;
+    place-content: center;
+    justify-content: center;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+}
+
+.brand-logo{
+    @apply text-xl rounded p-2 transition-default;
+}
+.brand-logo:hover{
+    @apply bg-blue-800;
+}
+
+.btn{
+    @apply p-2 rounded transition-default;
+}
+.btn.btn-blue:hover{
+    @apply bg-blue-800 text-gray-200;
+}
+
+@tailwind utilities;
