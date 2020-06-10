@@ -1,29 +1,62 @@
-import * as DOM from './elements';
-import * as Action from './actions';
-import {isLogged} from "./utils";
-import {contextPath} from "./constants";
+import { isLogged } from './utils';
+import Index from './components/Index';
+import IndexNavbar from './components/IndexNavbar';
+import {
+	deleteSuccessAlert,
+	deleteErrorAlert,
+	toggleSignIn,
+	toggleSignUp,
+	indexSignOut,
+	indexGoToDashboard,
+	handleSignInPassword,
+	handleSignInUsername,
+	handleSignUpPasswordConfirm,
+	handleSignUpPassword,
+	handleSignUpEmail,
+	handleSignUpUsername,
+	handleSignUpSubmit,
+	handleSignInSubmit,
+	handleSignInRemember,
+} from './actions';
 
-document.addEventListener("DOMContentLoaded", () => {
-    Action.enableDeleteAlert();
+document.addEventListener('DOMContentLoaded', () => {
+	if (isLogged()) {
+		IndexNavbar.data.isLogged = true;
+	}
 
-    if (isLogged()){
-        Action.toggleNavbarActiveBtn();
-        DOM.signOutBtn.addEventListener('click', Action.signOut);
-        DOM.dashboardBtn.addEventListener('click', () => window.location.href = `${contextPath}/app.html`)
-    } else {
-        DOM.signInNav.addEventListener('click', Action.toggleSignInSection);
-        DOM.signUpNav.addEventListener('click', Action.toggleSignUpSection);
-        DOM.signUpEmail.addEventListener('keyup', Action.checkEmailValidity);
-        DOM.signUpConfirmPassword.addEventListener('keyup', Action.checkPasswordMatch);
-        DOM.signUpForm.addEventListener('submit', Action.signUp);
-        DOM.signInForm.addEventListener('submit', Action.signIn);
-        DOM.signInUsername.addEventListener('focus', () => Action.toggleSignInUsernameError(false));
-        DOM.signInPassword.addEventListener('focus', () => Action.toggleSignInPasswordError(false));
-        DOM.signUpUsername.addEventListener('focus', () => Action.toggleSignUpUsernameError(false));
-        DOM.signUpEmail.addEventListener('focus', () => Action.toggleSignUpMailError(false));
-        DOM.signUpPassword.addEventListener('focus', () => Action.toggleSignUpPasswordError(false));
-        DOM.signUpConfirmPassword.addEventListener('focus', () => Action.toggleSignUpPasswordCheckError(false));
-    }
+	document.addEventListener('click', (event: Event) => {
+		// ALERTS
+		deleteSuccessAlert(event);
+		deleteErrorAlert(event);
 
-    DOM.homeBtn.addEventListener('click', Action.goBackHome);
+		// INDEX NAVBAR
+		toggleSignIn(event);
+		toggleSignUp(event);
+		indexSignOut(event);
+		indexGoToDashboard(event);
+	});
+
+	document.addEventListener('keyup', (event: Event) => {
+		// SIGNUP
+		handleSignUpUsername(event);
+		handleSignUpEmail(event);
+		handleSignUpPassword(event);
+		handleSignUpPasswordConfirm(event);
+
+		// SIGNIN
+		handleSignInUsername(event);
+		handleSignInPassword(event);
+	});
+
+	document.addEventListener('submit', (event: Event) => {
+		handleSignUpSubmit(event);
+		handleSignInSubmit(event);
+	});
+
+	document.addEventListener('change', (event: Event) => {
+		handleSignInRemember(event);
+	});
+
+	Index.render();
+	IndexNavbar.render();
 });

@@ -2,7 +2,6 @@ package it.polimi.tiw.imgalleryjs.controllers;
 
 import com.google.gson.Gson;
 import it.polimi.tiw.imgalleryjs.exceptions.*;
-import it.polimi.tiw.imgalleryjs.exceptions.InternalError;
 import it.polimi.tiw.imgalleryjs.services.UserService;
 import it.polimi.tiw.imgalleryjs.utils.SQLExceptionHandler;
 
@@ -13,13 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 
 @WebServlet("/signin")
 @MultipartConfig
 public class SignInController extends HttpServlet {
-
+    private static final long serialVersionUID = 1L;
     private Gson gson;
 
     @Override
@@ -67,6 +65,6 @@ public class SignInController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        
     }
 }

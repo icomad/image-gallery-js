@@ -1,531 +1,745 @@
-import * as DOM from "./elements";
-import {isLogged, render, sortableGrid, validateEmail} from "./utils";
-import {contextPath} from "./constants";
-import {albumElem, albumGrid, imageCollection, imageElem, imageGrid} from "./templates";
+import AlbumGrid from './components/AlbumGrid';
+import { contextPath, sortableGrid, validateEmail } from './utils';
+import ErrorAlert from './components/ErrorAlert';
+import App from './components/App';
+import IndexNavbar from './components/IndexNavbar';
+import SuccessAlert from './components/SuccessAlert';
+import AppNavbar from './components/AppNavbar';
+import Index from './components/Index';
+import SignUp from './components/SignUp';
+import SignIn from './components/SignIn';
+import AddAlbumForm from './components/AddAlbumForm';
+import makeAlbumDetailComponent from './components/AlbumDetail';
+import LoadingModal from './components/LoadingModal';
+import makeImageDetailComponent from './components/ImageDetail';
 
-export function forbidAccess(){
-    displayError("You are not signed in!");
-    window.location.href = `${contextPath}`;
+/**
+ *
+ * SIGNUP ACTIONS
+ *
+ */
+
+export function handleSignUpUsername(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#username-signup')) return;
+
+	SignUp.data.username = elem.value;
 }
 
-export function goBackHome(){
-    window.location.href = contextPath;
+export function handleSignUpEmail(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#email-signup')) return;
+
+	SignUp.data.email = elem.value;
+	if (!validateEmail(SignUp.data.email)) SignUp.data.emailError = 'Enter a valid email address!';
+	else SignUp.data.emailError = '';
 }
 
-export function displayError(error: string){
-    DOM.errorBody.innerText = error;
-    DOM.errorSection.classList.remove('hidden');
+export function handleSignUpPassword(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#password-signup')) return;
+
+	SignUp.data.password = elem.value;
+	if (SignUp.data.password !== SignUp.data.passwordConfirm) {
+		SignUp.data.passwordConfirmError = 'Passwords do not match';
+		SignUp.data.passwordError = 'Passwords do not match';
+	} else {
+		SignUp.data.passwordConfirmError = '';
+		SignUp.data.passwordError = '';
+	}
 }
 
-export function displaySuccessMessage(message: string){
-    DOM.successBody.innerText = message;
-    DOM.successSection.classList.remove('hidden');
+export function handleSignUpPasswordConfirm(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#confirm-password-signup')) return;
+
+	SignUp.data.passwordConfirm = elem.value;
+	if (SignUp.data.password !== SignUp.data.passwordConfirm) {
+		SignUp.data.passwordConfirmError = 'Passwords do not match';
+		SignUp.data.passwordError = 'Passwords do not match';
+	} else {
+		SignUp.data.passwordConfirmError = '';
+		SignUp.data.passwordError = '';
+	}
 }
 
-export function enableDeleteAlert(){
-    const deleteAlertButtons = document.querySelectorAll('.alert-delete') || [];
-    deleteAlertButtons.forEach(button => button.addEventListener('click', () => DOM.errorSection.classList.add('hidden')));
+export async function handleSignUpSubmit(e: Event) {
+	const elem = e.target as HTMLFormElement;
+	if (!elem.matches('#signup-form')) return;
+
+	e.preventDefault();
+
+	if (IndexNavbar.data.isLogged) return;
+
+	const body = new FormData();
+	body.append('username', SignUp.data.username);
+	body.append('password', SignUp.data.password);
+	body.append('email', SignUp.data.email);
+	body.append('passwordCheck', SignUp.data.passwordConfirm);
+
+	try {
+		const response = await fetch(`${contextPath}/signup`, { method: 'POST', body });
+
+		switch (response.status) {
+			case 200:
+				const user = await response.json();
+				sessionStorage.setItem('user', JSON.stringify(user));
+				SignUp.data.username = '';
+				SignUp.data.email = '';
+				SignUp.data.password = '';
+				SignUp.data.passwordConfirm = '';
+				SignUp.data.usernameError = '';
+				SignUp.data.emailError = '';
+				SignUp.data.passwordError = '';
+				SignUp.data.passwordConfirmError = '';
+				SignUp.data.genericError = false;
+				(document.querySelector('#signup-form') as HTMLFormElement).reset();
+				window.location.href = `${contextPath}/app.html`;
+				return;
+			case 400:
+				const error: SignUpResponseError = await response.json();
+				SignUp.data.genericError = false;
+				if (error.field === 'username') SignUp.data.usernameError = error.error;
+				else if (error.field === 'password') SignUp.data.passwordError = error.error;
+				else if (error.field === 'email') SignUp.data.emailError = error.error;
+				else if (error.field === 'confirmPassword') SignUp.data.passwordConfirmError = error.error;
+				return;
+			case 401:
+			case 500:
+				const err: GenericError = await response.json();
+				SignUp.data.passwordError = '';
+				SignUp.data.usernameError = '';
+				SignUp.data.genericError = true;
+				ErrorAlert.data.message = err.error;
+				Index.data.showError = true;
+				Index.attach(ErrorAlert);
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		Index.data.showError = true;
+		Index.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleDashboardSection(){
-    if (!isLogged()){
-        displayError("You are not signed in!");
-        return;
-    }
+/**
+ *
+ * SIGNIN ACTIONS
+ *
+ */
 
-    if (DOM.dashboardSection.classList.contains('hidden')){
-        DOM.addImageForm.reset();
-        DOM.albumSection.classList.add('hidden');
-        DOM.imageSection.classList.add('hidden');
-        DOM.dashboardSection.classList.remove('hidden');
-    }
+export function handleSignInUsername(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#username-signin')) return;
+
+	SignIn.data.username = elem.value;
 }
 
-export function nextImagePage(e: Event){
-    const startingIndex = parseInt((e.currentTarget as HTMLElement).dataset.index!);
-    // @ts-ignore
-    const imageGrid = [...DOM.imageGridContainer.children].find((child: HTMLElement) => !child.classList.contains('hidden'));
-    if (imageGrid !== undefined){
-        [...imageGrid.children].forEach((image, index) => {
-            if (index < startingIndex) image.classList.add('hidden');
-            if (index >= startingIndex && index < startingIndex+5) image.classList.remove('hidden');
-        })
-    }
+export function handleSignInPassword(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#password-signin')) return;
+
+	SignIn.data.password = elem.value;
 }
 
-export function prevImagePage(){}
+export function handleSignInRemember(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#remember-signin')) return;
 
-export async function toggleAlbumSection(e: Event){
-    if (!isLogged()){
-        displayError("You are not signed in!");
-        return;
-    }
-
-    DOM.nextButton.classList.add('hidden');
-    DOM.nextButton.dataset.index = "0";
-    DOM.backButton.classList.add('hidden')
-    DOM.backButton.dataset.index = "0";
-
-    const albumId = (e.currentTarget as HTMLElement).dataset.target;
-    const albumTitle = (e.currentTarget as HTMLElement).dataset.title;
-
-    DOM.albumSectionTitle.innerText = albumTitle!;
-    DOM.addImageAlbumId.value = albumId!;
-
-    // @ts-ignore
-    const imageGridRetrieved = [...DOM.imageGridContainer.children].find((child: HTMLElement) => child.dataset.album == albumId);
-
-    if (imageGridRetrieved !== undefined){
-        DOM.dashboardSection.classList.add('hidden');
-        DOM.imageSection.classList.add('hidden');
-        DOM.albumSection.classList.remove('hidden');
-
-        if (imageGridRetrieved.childElementCount > 5) {
-            DOM.nextButton.classList.remove('hidden');
-            DOM.nextButton.dataset.index = "5";
-        }
-
-        // @ts-ignore
-        [...DOM.imageGridContainer.children].forEach((child: HTMLElement) => {
-            child.dataset.album !== albumId ? child.classList.add('hidden') : child.classList.remove('hidden');
-        })
-        return;
-    }
-
-    try{
-        const response = await fetch(`${contextPath}/images?albumId=${albumId}`);
-        switch (response.status) {
-            case 200:
-                const {album, images}: {album: Album, images: Image[]} = await response.json();
-
-                if (images.length > 5) {
-                    DOM.nextButton.classList.remove('hidden');
-                    DOM.nextButton.dataset.index = "5";
-                }
-
-                const imageGridElem = imageGrid(album.id);
-                const imageCollectionElem = imageCollection(images);
-
-                if (Array.isArray(imageCollectionElem)){
-                    imageCollectionElem.forEach((image, index) => {
-                        image.addEventListener('click', toggleImageModal);
-                        if (index > 4) image.classList.add('hidden');
-                        else image.classList.remove('hidden');
-                        imageGridElem.appendChild(image);
-                    });
-                } else imageGridElem.appendChild(imageCollectionElem)
-
-                DOM.imageGridContainer.appendChild(imageGridElem);
-
-                if (DOM.albumSection.classList.contains('hidden')){
-                    DOM.dashboardSection.classList.add('hidden');
-                    DOM.imageSection.classList.add('hidden');
-                    DOM.albumSection.classList.remove('hidden');
-                    // @ts-ignore
-                    [...DOM.imageGridContainer.children].forEach((child: HTMLElement) => {
-                        child.dataset.album !== albumId ? child.classList.add('hidden') : child.classList.remove('hidden');
-                    })
-                }
-                return;
-            case 400:
-            case 500:
-                const error: GenericError = await response.json();
-                displayError("Something went wrong! " + error.error);
-                return;
-            default:
-                return;
-        }
-    } catch (e) {
-        console.log(e);
-        displayError("Something went wrong!");
-    }
+	SignIn.data.remember = elem.checked;
 }
 
-export async function addImage(e: Event){
-    e.preventDefault();
+export async function handleSignInSubmit(e: Event) {
+	const elem = e.target as HTMLFormElement;
+	if (!elem.matches('#signin-form')) return;
 
-    if (!isLogged()) {
-        displayError("You are not signed in!");
-        return;
-    }
+	e.preventDefault();
 
-    const body = new FormData(DOM.addImageForm);
+	if (IndexNavbar.data.isLogged) return;
 
-    try{
-        const response = await fetch(`${contextPath}/images`, {method: 'post', body});
-        switch (response.status) {
-            case 200:
-                const image: Image = await response.json();
-                // @ts-ignore
-                const imageGrid = [...DOM.imageGridContainer.children].find((child: HTMLElement) => child.dataset.album == image.albumId) as HTMLElement;
-                if (imageGrid.childElementCount === 1 && !imageGrid.firstElementChild!.classList.contains('image')){
-                    imageGrid.removeChild(imageGrid.firstElementChild!);
-                }
-                const imageElement = render(imageElem(image));
-                imageElement.addEventListener('click', toggleImageModal);
-                imageGrid.insertBefore(imageElement, imageGrid.firstElementChild);
+	const body = new FormData();
+	body.append('username', SignIn.data.username);
+	body.append('password', SignIn.data.password);
 
-                if (imageGrid.childElementCount > 5) {
-                    DOM.nextButton.classList.remove('hidden');
-                    DOM.nextButton.dataset.index = "5";
-                    // @ts-ignore
-                    [...imageGrid.children].forEach((child, index) => {
-                        if (index > 4) child.classList.add('hidden');
-                        else child.classList.remove('hidden');
-                    })
-                }
+	try {
+		const response = await fetch(`${contextPath}/signin`, { method: 'POST', body });
 
-                DOM.addImageForm.reset();
-                return;
-            case 400:
-            case 500:
-                const error: GenericError = await response.json();
-                displayError("Something went wrong! " + error.error);
-                DOM.addImageForm.reset();
-                return;
-            default:
-                return;
-        }
-    } catch (e) {
-        console.log(e);
-        displayError("Something went wrong!");
-        DOM.addImageForm.reset();
-    }
+		switch (response.status) {
+			case 200:
+				const user = await response.json();
+				sessionStorage.setItem('user', JSON.stringify(user));
+				if (SignIn.data.remember) {
+					const userWithExpiration = {
+						user,
+						expiry: new Date().getTime() + 1000 * 60 * 60 * 12,
+					};
+					localStorage.setItem('user', JSON.stringify(userWithExpiration));
+				}
+				IndexNavbar.data.isLogged = true;
+				SignIn.data.username = '';
+				SignIn.data.password = '';
+				SignIn.data.usernameError = '';
+				SignIn.data.passwordError = '';
+				SignIn.data.genericError = false;
+				SignIn.data.remember = false;
+				(document.querySelector('#signin-form') as HTMLFormElement).reset();
+				window.location.href = `${contextPath}/app.html`;
+				return;
+			case 400:
+				const error: SignInResponseError = await response.json();
+				SignIn.data.genericError = false;
+				if (error.field === 'username') {
+					SignIn.data.usernameError = error.error;
+				} else if (error.field === 'password') {
+					SignIn.data.passwordError = error.error;
+				}
+				return;
+			case 401:
+			case 500:
+				const err: GenericError = await response.json();
+				SignIn.data.passwordError = '';
+				SignIn.data.usernameError = '';
+				SignIn.data.genericError = true;
+				ErrorAlert.data.message = err.error;
+				Index.data.showError = true;
+				Index.attach(ErrorAlert);
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		Index.data.showError = true;
+		Index.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleImageModal(e: Event){
+/**
+ *
+ * INDEX NAVBAR ACTIONS
+ *
+ */
 
+export function toggleSignIn(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#signin-nav')) return;
+
+	if (IndexNavbar.data.isLogged) return;
+	Index.attach(SignIn);
+	Index.detach(SignUp);
+	Index.render();
 }
 
-export function toggleSignInSection(){
-    if (isLogged()){
-        displayError("You are already signed in!");
-        return;
-    }
+export function toggleSignUp(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#signup-nav')) return;
 
-    if (DOM.signInSection.classList.contains('hidden')) {
-        DOM.signUpSection.classList.add('hidden');
-        DOM.signInSection.classList.remove('hidden');
-    }
+	if (IndexNavbar.data.isLogged) return;
+
+	Index.attach(SignUp);
+	Index.detach(SignIn);
+	Index.render();
 }
 
-export function toggleSignUpSection() {
-    if (isLogged()){
-        displayError("You are already signed in!");
-        return;
-    }
+export async function indexSignOut(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#signout-btn')) return;
 
-    if (DOM.signUpSection.classList.contains('hidden')) {
-        DOM.signInSection.classList.add('hidden');
-        DOM.signUpSection.classList.remove('hidden');
-    }
+	if (!IndexNavbar.data.isLogged) return;
+
+	try {
+		const response = await fetch(`${contextPath}/signout`);
+
+		if (response.status === 200) {
+			sessionStorage.removeItem('user');
+			localStorage.removeItem('user');
+			SuccessAlert.data.message = 'You successfully signed out!';
+			Index.data.showSuccess = true;
+			Index.attach(SuccessAlert);
+			window.location.href = contextPath;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		Index.data.showError = true;
+		Index.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleNavbarActiveBtn(){
-    DOM.signOutBtn.classList.toggle('hidden');
-    DOM.signInNav.classList.toggle('hidden');
-    DOM.signUpNav.classList.toggle('hidden');
-    DOM.dashboardBtn.classList.toggle('hidden');
+export function indexGoToDashboard(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#dashboard-btn')) return;
+
+	if (!IndexNavbar.data.isLogged) return;
+	window.location.href = `${contextPath}/app.html`;
 }
 
-export async function signOut(){
-    if (!isLogged()) {
-        displayError("You are not signed in!");
-        return;
-    }
+/**
+ *
+ * APP NAVBAR ACTIONS
+ *
+ */
 
-    try{
-        const response = await fetch(`${contextPath}/signout`)
-        if (response.status === 200){
-            sessionStorage.removeItem("user");
-            displaySuccessMessage("You successfully signed out!")
-            window.location.href = contextPath;
-        }
-    } catch (e) {
-        displayError('Something went wrong! Network error!');
-    }
+export async function appSignOut(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#signout-btn')) return;
+
+	try {
+		const response = await fetch(`${contextPath}/signout`);
+
+		if (response.status === 200) {
+			sessionStorage.removeItem('user');
+			localStorage.removeItem('user');
+			SuccessAlert.data.message = 'You successfully signed out!';
+			App.data.showSuccess = true;
+			App.attach(SuccessAlert);
+			window.location.href = contextPath;
+		} else {
+			ErrorAlert.data.message = 'Something went wrong!';
+			App.data.showError = true;
+			App.attach(ErrorAlert);
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export async function signUp(e: Event){
-    e.preventDefault();
+export function appGoToDashboard(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#dashboard-nav')) return;
 
-    if (isLogged()){
-        displayError("You are already signed in!");
-        return;
-    }
+	App.data.showDashboard = true;
+	App.data.showAlbum = false;
+	App.data.currentAlbum = null;
+}
+/**
+ *
+ * ERROR ALERT ACTIONS
+ *
+ */
 
-    const body = new FormData(DOM.signUpForm);
+export function deleteErrorAlert(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#error-alert-delete')) return;
 
-    try{
-        const response = await fetch(`${contextPath}/signup`, { method: 'POST', body });
-        switch (response.status) {
-            case 200:
-                const user = await response.json();
-                sessionStorage.setItem("user", user);
-                window.location.href = `${contextPath}/app.html`;
-                DOM.signInForm.reset();
-                return;
-            case 400:
-                const error: SignUpResponseError = await response.json();
-                displayError("OH! Something went wrong!");
-                if (error.field === 'username'){
-                    toggleSignUpUsernameError(true, error.error);
-                }
-                else if(error.field === 'email'){
-                    toggleSignUpMailError(true, error.error);
-                }
-                else if(error.field === 'password'){
-                    toggleSignUpPasswordError(true, error.error);
-                }
-                else if(error.field === 'confirmPassword'){
-                    toggleSignUpPasswordCheckError(true, error.error);
-                    toggleSignUpPasswordError(true, error.error);
-                }
-                return;
-            case 500:
-                const err: SignInResponseError = await response.json();
-                displayError("OH! Something went wrong! " + err.error);
-                DOM.signInForm.reset();
-                return;
-            default:
-                return;
-        }
-    } catch(e){
-        displayError('Something went wrong! Network error!');
-        DOM.signUpForm.reset();
-    }
-
+	if (!IndexNavbar.data.isLogged && AppNavbar.data.isLogged) {
+		App.data.showError = false;
+		App.detach(ErrorAlert);
+	} else {
+		Index.data.showError = false;
+		Index.detach(ErrorAlert);
+	}
 }
 
-export async function signIn(e: Event){
-    e.preventDefault();
+/**
+ *
+ * SUCCESS ALERT ACTIONS
+ *
+ */
 
-    if (isLogged()){
-        displayError("You are already signed in!");
-        return;
-    }
+export function deleteSuccessAlert(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#success-alert-delete')) return;
 
-    const body = new FormData(DOM.signInForm);
-
-    try{
-        const response = await fetch(`${contextPath}/signin`, { method: 'POST', body });
-        switch (response.status) {
-            case 200:
-                const user = await response.json();
-                sessionStorage.setItem("user", user);
-                window.location.href = `${contextPath}/app.html`;
-                DOM.signInForm.reset();
-                return;
-            case 401:
-            case 500:
-                const err: SignInResponseError = await response.json();
-                displayError("OH! Something went wrong! " + err.error);
-                return;
-            case 400:
-                const error: SignInResponseError = await response.json();
-                displayError("OH! Something went wrong!");
-                if (error.field === 'username'){
-                    toggleSignInUsernameError(true, error.error);
-                }
-                else if(error.field === 'password'){
-                    toggleSignInPasswordError(true, error.error);
-                }
-                return;
-            default:
-                return;
-        }
-    } catch(e){
-        displayError('Something went wrong! Network error!');
-        DOM.signInForm.reset();
-    }
+	if (!IndexNavbar.data.isLogged && AppNavbar.data.isLogged) {
+		App.data.showSuccess = false;
+		App.detach(SuccessAlert);
+	} else {
+		Index.data.showSuccess = false;
+		Index.detach(SuccessAlert);
+	}
 }
 
-export function toggleSignInUsernameError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signInUsername.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.usernameSignInError.classList.remove('hidden');
-        DOM.usernameSignInError.innerText = error;
-    } else{
-        DOM.signInUsername.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.usernameSignInError.innerText = '';
-        DOM.usernameSignInError.classList.add('hidden');
-    }
+/**
+ *
+ * ALBUM GRID ACTIONS
+ *
+ */
+
+export async function retrieveAlbums(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#album-grid') || AlbumGrid.data.attempted) return;
+
+	AlbumGrid.data.attempted = true;
+	try {
+		const response = await fetch(`${contextPath}/albums`);
+		switch (response.status) {
+			case 200:
+				const albums: Album[] = await response.json();
+				AlbumGrid.data.albums = [...albums];
+				sortableGrid(document.getElementById('album-grid')!, () => updateOrder());
+				return;
+			case 500:
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'OPS! Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleSignInPasswordError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signInPassword.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.passwordSignInError.classList.remove('hidden');
-        DOM.passwordSignInError.innerText = error;
-    } else{
-        DOM.signInPassword.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.passwordSignInError.innerText = '';
-        DOM.passwordSignInError.classList.add('hidden');
-    }
+async function updateOrder() {
+	// @ts-ignore
+	for (const album of document.getElementById('album-grid')!.children) {
+		const id = (album as HTMLElement).dataset.id!;
+		const newOrder = (album as HTMLElement).dataset.order!;
+		const body = new FormData();
+		body.append('albumId', id);
+		body.append('newOrder', newOrder);
+		const alb = AlbumGrid.data.albums.find((album) => album.id === parseInt(id));
+		alb!.order = parseInt(newOrder);
+
+		try {
+			const response = await fetch(`${contextPath}/albums`, { method: 'PUT', body });
+			if (response.status !== 200) {
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'OPS! Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				continue;
+			}
+			const success = await response.json();
+		} catch (error) {
+			ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+			App.data.showError = true;
+			App.attach(ErrorAlert);
+			console.error(error);
+		}
+	}
 }
 
-export function toggleSignUpUsernameError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signUpUsername.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.usernameSignUpError.classList.remove('hidden');
-        DOM.usernameSignUpError.innerText = error;
-    } else{
-        DOM.signUpUsername.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.usernameSignUpError.innerText = '';
-        DOM.usernameSignUpError.classList.add('hidden');
-    }
+export async function openAlbum(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('.album')) return;
+
+	const albumId = parseInt(elem.dataset.id!);
+	const album = AlbumGrid.data.albums.find((a) => a.id === albumId);
+	let images: Image[];
+
+	try {
+		const response = await fetch(`${contextPath}/images?albumId=${albumId}`);
+		switch (response.status) {
+			case 200:
+				images = await response.json();
+				const albumDetailComponent = makeAlbumDetailComponent(album!, images);
+				App.data.currentAlbum = albumDetailComponent;
+				App.data.showDashboard = false;
+				App.data.showAlbum = true;
+				return;
+			case 400:
+			case 500:
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleSignUpMailError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signUpEmail.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.emailSignUpError.classList.remove('hidden');
-        DOM.emailSignUpError.innerText = error;
-    } else{
-        DOM.signUpEmail.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.emailSignUpError.innerText = '';
-        DOM.emailSignUpError.classList.add('hidden');
-    }
+/**
+ *
+ * ADD ALBUM FORM ACTIONS
+ *
+ */
+
+export function handleAddAlbumTitle(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-album-title')) return;
+
+	AddAlbumForm.data.albumTitle = elem.value;
 }
 
-export function toggleSignUpPasswordError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signUpPassword.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.passwordSignUpError.classList.remove('hidden');
-        DOM.passwordSignUpError.innerText = error;
-    } else{
-        DOM.signUpEmail.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.passwordSignUpError.innerText = '';
-        DOM.passwordSignUpError.classList.add('hidden');
-    }
+export async function addAlbum(e: Event) {
+	const elem = e.target as HTMLFormElement;
+	if (!elem.matches('#add-album-form')) return;
+
+	e.preventDefault();
+
+	const body = new FormData();
+	body.append('title', AddAlbumForm.data.albumTitle);
+
+	try {
+		const response = await fetch(`${contextPath}/albums`, { method: 'post', body });
+		switch (response.status) {
+			case 200:
+				const album: Album = await response.json();
+				AlbumGrid.data.albums.push(album);
+				AddAlbumForm.data.albumTitle = '';
+				AddAlbumForm.data.albumTitleError = '';
+				AddAlbumForm.data.genericError = false;
+				(document.querySelector('#add-album-form') as HTMLFormElement).reset();
+				AlbumGrid.render();
+				return;
+			case 400:
+			case 500:
+				const error: AlbumResponseError = await response.json();
+				AddAlbumForm.data.genericError = true;
+				ErrorAlert.data.message = error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		console.error(error);
+	}
 }
 
-export function toggleSignUpPasswordCheckError(enable: boolean, error: string | null = null){
-    if (enable && error){
-        DOM.signUpConfirmPassword.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.confirmPasswordError.classList.remove('hidden');
-        DOM.confirmPasswordError.innerText = error;
-    } else{
-        DOM.signUpConfirmPassword.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.confirmPasswordError.innerText = '';
-        DOM.confirmPasswordError.classList.add('hidden');
-    }
+/**
+ *
+ * ADD IMAGE FORM ACTIONS
+ *
+ */
+
+export function handleAddImageTitle(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-image-title')) return;
+
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm) return;
+
+	App.data.currentAlbum!.data.imageForm!.data.title = elem.value;
 }
 
-export function checkEmailValidity(e: Event){
-    const el = (e.target as HTMLInputElement);
-    if (!validateEmail(el.value)){
-        DOM.signUpEmail.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.emailSignUpError.classList.remove('hidden');
-        DOM.emailSignUpError.innerText = 'Enter a valid email!';
-    } else {
-        DOM.signUpEmail.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.emailSignUpError.innerText = '';
-        DOM.emailSignUpError.classList.add('hidden');
-    }
+export function handleAddImageDescription(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-image-description')) return;
+
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm) return;
+
+	App.data.currentAlbum!.data.imageForm!.data.description = elem.value;
 }
 
-export function checkPasswordMatch(e: Event){
-    const el = (e.target as HTMLInputElement);
-    const password = DOM.signUpForm.password.value;
-    if(el.value !== password){
-        DOM.signUpPassword.classList.add('border-2', 'border-red-500', 'outline-none');
-        DOM.signUpConfirmPassword.classList.add('border-2', 'border-red-500', 'oultine-none');
-        DOM.confirmPasswordError.classList.remove('hidden');
-        DOM.confirmPasswordError.innerText = 'Passwords do not match!'
-    } else{
-        DOM.signUpPassword.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.signUpConfirmPassword.classList.remove('border-2', 'border-red-500', 'outline-none');
-        DOM.confirmPasswordError.innerText = ''
-        DOM.confirmPasswordError.classList.add('hidden');
-    }
+export function handleAddImageFile(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-image-file')) return;
+
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm) return;
+	if (elem.files === null) return;
+
+	App.data.currentAlbum!.data.imageForm!.data.file = elem.files[0];
 }
 
-export async function retrieveAlbums(){
-    if (!isLogged()) {
-        displayError("You are not signed in!");
-        return;
-    }
+export async function addImage(e: Event) {
+	const elem = e.target as HTMLFormElement;
+	if (!elem.matches('#add-image-form')) return;
 
-    try{
-        const response = await fetch(`${contextPath}/albums`);
-        if (response.status === 200){
-            const albums: Album[] = await response.json();
-            const albumCollection = albumGrid(albums);
+	e.preventDefault();
+	LoadingModal.data.showModal = true;
+	LoadingModal.data.text = 'Uploading image...';
+	document.querySelector('body')!.style.pointerEvents = 'none';
 
-            if (Array.isArray(albumCollection)){
-                for (const album of albumCollection) {
-                    album.addEventListener('click', toggleAlbumSection);
-                    DOM.albumGrid.appendChild(album);
-                }
-            } else DOM.albumGrid.appendChild(albumCollection)
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm) return;
+	const form = App.data.currentAlbum.data.imageForm;
 
-            sortableGrid(DOM.albumGrid, () => updateOrder());
-        } else{
-            const error: GenericError = await response.json();
-            displayError('Something went wrong! ' + error.error);
-        }
-    } catch (e) {
-        displayError('Something went wrong! Network error!');
-    }
+	const body = new FormData();
+	body.append('albumId', form.data.albumId.toString());
+	body.append('title', form.data.title);
+	body.append('description', form.data.description);
+	body.append('imageFile', form.data.file!, form.data.file?.name);
+
+	try {
+		const response = await fetch(`${contextPath}/images`, { method: 'post', body });
+		switch (response.status) {
+			case 200:
+				const image: Image = await response.json();
+				App.data.currentAlbum.data.images.push(image);
+				App.data.currentAlbum.render();
+				form.data.description = '';
+				form.data.title = '';
+				form.data.file = null;
+				(document.querySelector('#add-image-form') as HTMLFormElement).reset();
+				LoadingModal.data.showModal = false;
+				document.querySelector('body')!.style.pointerEvents = 'auto';
+				App.data.currentAlbum.data.imageGrid!.data.page = 1;
+				return;
+			case 400:
+			case 500:
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				LoadingModal.data.showModal = false;
+				document.querySelector('body')!.style.pointerEvents = 'auto';
+				return;
+			default:
+				return;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		LoadingModal.data.showModal = false;
+		document.querySelector('body')!.style.pointerEvents = 'auto';
+		console.error(error);
+	}
 }
 
-export async function updateOrder(){
-    // @ts-ignore
-    for (const album of DOM.albumGrid.children) {
-        const body = new FormData();
-        body.append("albumId", album.dataset.target!);
-        body.append("newOrder", album.dataset.order!);
-        try{
-            const response = await fetch(`${contextPath}/albums`, {method: 'PUT', body});
-            if (response.status !== 200) {
-                const error: GenericError = await response.json();
-                displayError("OPS! Something went wrong! " + error.error);
-                continue;
-            }
-            const success = await response.json();
-        } catch (e) {
-            console.log(e);
-            displayError("Something went wrong!");
-        }
-    }
+/**
+ *
+ * IMAGE GRID ACTIONS
+ *
+ */
+
+export function nextPage(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#next-page-btn')) return;
+
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageGrid) return;
+
+	App.data.currentAlbum.data.imageGrid.data.page += 1;
 }
 
-export async function addAlbum(e: Event){
-    e.preventDefault();
+export function prevPage(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#prev-page-btn')) return;
 
-    if (!isLogged()) {
-        displayError("You are not signed in!");
-        return;
-    }
+	if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageGrid) return;
 
-    const body = new FormData(DOM.addAlbumForm);
+	App.data.currentAlbum.data.imageGrid.data.page -= 1;
+}
 
-    try{
-        const response = await fetch(`${contextPath}/albums`, {method: 'POST', body});
-        switch (response.status) {
-            case 200:
-                const album: Album = await response.json();
-                if (DOM.albumGrid.childElementCount === 1 && !DOM.albumGrid.firstElementChild!.classList.contains('album')){
-                    DOM.albumGrid.removeChild(DOM.albumGrid.firstElementChild!);
-                }
-                const albumElement = render(albumElem(album));
-                albumElement.addEventListener('click', toggleAlbumSection);
-                DOM.albumGrid.insertBefore(albumElement, DOM.albumGrid.firstElementChild);
-                DOM.addAlbumForm.reset();
-                return;
-            case 400:
-            case 500:
-                const error: GenericError = await response.json();
-                displayError('Something went wrong! ' + error.error);
-                DOM.addAlbumForm.reset();
-                return;
-            default:
-                return;
-        }
-    } catch (e) {
-        console.log(e);
-        displayError("Something went wrong!");
-        DOM.addAlbumForm.reset();
-    }
+export async function openImage(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!('matches' in elem) || !elem.matches('.image')) return;
+	const image = App.data.currentAlbum?.data.images.find((img) => img.id === parseInt(elem.dataset.id!));
+	if (image === undefined) return;
+
+	let comments: CommentWithUsername[];
+
+	try {
+		const response = await fetch(`${contextPath}/comments?imageId=${image.id}`);
+		switch (response.status) {
+			case 200:
+				comments = await response.json();
+				const imageDetailComponent = makeImageDetailComponent(image, comments);
+				App.data.currentImage = imageDetailComponent;
+				App.data.showImage = true;
+				return;
+			case 400:
+			case 500:
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				return;
+			default:
+				return;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		console.error(error);
+	}
+}
+
+/**
+ *
+ * IMAGE DETAIL ACTIONS
+ *
+ */
+
+export function closeModal(e: Event) {
+	const elem = e.target as HTMLElement;
+	if (!elem.matches('#image-detail-modal')) return;
+
+	App.data.showImage = false;
+	App.data.currentImage = null;
+}
+
+export function handleAddCommentBody(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-comment-body')) return;
+
+	if (!App.data.currentImage) return;
+
+	App.data.currentImage.data.commentBody = elem.value;
+}
+
+export function onCommentInputFocus(e: Event) {
+	const elem = e.target as HTMLInputElement;
+	if (!elem.matches('#add-comment-body')) return;
+	if (!App.data.currentImage) return;
+	if (!App.data.currentImage.data.commentBodyError) return;
+
+	elem.value = '';
+	App.data.currentImage.data.commentBodyError = false;
+}
+
+export async function addComment(e: Event) {
+	const elem = e.target as HTMLFormElement;
+	if (!elem.matches('#add-comment-form')) return;
+	if (!App.data.currentImage) return;
+
+	e.preventDefault();
+
+	const imageDetail = App.data.currentImage;
+	if (imageDetail.data.commentBody.trim() === '') {
+		imageDetail.data.commentBodyError = true;
+		const input = document.querySelector('#add-comment-body') as HTMLInputElement;
+		input.value = 'You cannot send empty message!';
+		return;
+	}
+	const body = new FormData();
+	console.log(imageDetail.data.commentBody);
+	body.append('body', imageDetail.data.commentBody);
+	body.append('imageId', imageDetail.data.image.id.toString());
+
+	try {
+		const response = await fetch(`${contextPath}/comments`, { method: 'post', body });
+		switch (response.status) {
+			case 200:
+				const comment: CommentWithUsername = await response.json();
+				imageDetail.data.comments.push(comment);
+				imageDetail.render();
+				imageDetail.data.commentBody = '';
+				(document.querySelector('#add-comment-form') as HTMLFormElement).reset();
+				return;
+			case 400:
+			case 500:
+				const error: GenericError = await response.json();
+				ErrorAlert.data.message = 'Something went wrong! ' + error.error;
+				App.data.showError = true;
+				App.attach(ErrorAlert);
+				App.data.showImage = false;
+				App.data.currentImage = null;
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		ErrorAlert.data.message = 'Something went wrong! Possible network error!';
+		App.data.showError = true;
+		App.attach(ErrorAlert);
+		App.data.showImage = false;
+		App.data.currentImage = null;
+		console.error(error);
+	}
 }

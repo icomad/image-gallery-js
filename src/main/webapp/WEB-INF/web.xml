@@ -21,6 +21,18 @@
     <filter-name>Response Headers</filter-name>
     <url-pattern>/signup</url-pattern>
   </filter-mapping>
+    <filter-mapping>
+    <filter-name>Response Headers</filter-name>
+    <url-pattern>/albums</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>Response Headers</filter-name>
+    <url-pattern>/images</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>Response Headers</filter-name>
+    <url-pattern>/comments</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>User Signed</filter-name>
     <url-pattern>/signout</url-pattern>
@@ -33,8 +45,21 @@
     <filter-name>User Signed</filter-name>
     <url-pattern>/albums</url-pattern>
   </filter-mapping>
+  <filter-mapping>
+    <filter-name>User Signed</filter-name>
+    <url-pattern>/images</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>User Signed</filter-name>
+    <url-pattern>/comments</url-pattern>
+  </filter-mapping>
+
 
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+
+  <session-config>
+    <session-timeout>360</session-timeout>
+  </session-config>
 </web-app>

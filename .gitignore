@@ -236,4 +236,10 @@ buildNumber.properties
 node_modules
 src/main/client/node_modules
 
+# VSCode
+.vscode/
+.settings/
+.project
+.classpath
+
 # End of https://www.gitignore.io/api/java,maven,intellij,intellij+all,intellij+iml

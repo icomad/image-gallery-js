@@ -7,6 +7,7 @@ import it.polimi.tiw.imgalleryjs.exceptions.*;
 import it.polimi.tiw.imgalleryjs.services.AlbumService;
 import it.polimi.tiw.imgalleryjs.services.ImageService;
 import it.polimi.tiw.imgalleryjs.utils.SQLExceptionHandler;
+import net.coobird.thumbnailator.Thumbnails;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -23,6 +24,7 @@ import java.util.Date;
 @WebServlet("/images")
 @MultipartConfig
 public class ImageController extends HttpServlet {
+    private static final long serialVersionUID = 1L;
     private Gson gson;
 
     @Override
@@ -32,7 +34,8 @@ public class ImageController extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         var out = response.getWriter();
-        var dirPath = "/Users/icomad/Desktop/server_images/";
+        var resourcesPath = System.getProperty("static.resources");
+        var dirPath = resourcesPath + "/static/";
         Part filePart = request.getPart("imageFile");
         var title = request.getParameter("title");
         var description = request.getParameter("description");
@@ -122,9 +125,7 @@ public class ImageController extends HttpServlet {
                 return;
             }
             var images = imageService.findAllByAlbum(album.getId());
-            var data = new JsonObject();
-            data.add("album", this.gson.toJsonTree(album));
-            data.add("images", this.gson.toJsonTree(images));
+            var data = this.gson.toJson(images);
             response.setStatus(HttpServletResponse.SC_OK);
             out.print(data);
             out.flush();
@@ -146,8 +147,10 @@ public class ImageController extends HttpServlet {
         String uniqueId = Long.toString(new Date().getTime());
         String fileName = uniqueId + ogFileName;
         File targetFile = new File(dirPath + fileName);
-        try (OutputStream output = new FileOutputStream(targetFile); InputStream fileContent = filePart.getInputStream();) {
+        File thumbnailFile = new File(dirPath + "thumbnail_" + fileName);
+        try (var output = new FileOutputStream(targetFile); var thumbnail = new FileOutputStream(thumbnailFile); var thumbnailContent = filePart.getInputStream(); var fileContent = filePart.getInputStream();) {
             fileContent.transferTo(output);
+            Thumbnails.of(thumbnailContent).size(200, 200).toOutputStream(thumbnail);
         }
         return fileName;
     }

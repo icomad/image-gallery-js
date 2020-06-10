@@ -23,6 +23,10 @@ public class ResponseHeadersFilter implements Filter {
             response.setHeader("Cache-Control", "no-cache");
             response.setDateHeader("Expires", 0);
         }
+        if(request.getCharacterEncoding() == null)
+        {
+            request.setCharacterEncoding("UTF-8");
+        }
         chain.doFilter(req, resp);
     }
 

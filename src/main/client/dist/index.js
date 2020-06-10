@@ -1,27 +1,38 @@
-import * as DOM from './elements';
-import * as Action from './actions';
-import { isLogged } from "./utils";
-import { contextPath } from "./constants";
-document.addEventListener("DOMContentLoaded", function () {
-    Action.enableDeleteAlert();
+import { isLogged } from './utils';
+import Index from './components/Index';
+import IndexNavbar from './components/IndexNavbar';
+import { deleteSuccessAlert, deleteErrorAlert, toggleSignIn, toggleSignUp, indexSignOut, indexGoToDashboard, handleSignInPassword, handleSignInUsername, handleSignUpPasswordConfirm, handleSignUpPassword, handleSignUpEmail, handleSignUpUsername, handleSignUpSubmit, handleSignInSubmit, handleSignInRemember, } from './actions';
+document.addEventListener('DOMContentLoaded', function () {
     if (isLogged()) {
-        Action.toggleNavbarActiveBtn();
-        DOM.signOutBtn.addEventListener('click', Action.signOut);
-        DOM.dashboardBtn.addEventListener('click', function () { return window.location.href = contextPath + "/app.html"; });
+        IndexNavbar.data.isLogged = true;
     }
-    else {
-        DOM.signInNav.addEventListener('click', Action.toggleSignInSection);
-        DOM.signUpNav.addEventListener('click', Action.toggleSignUpSection);
-        DOM.signUpEmail.addEventListener('keyup', Action.checkEmailValidity);
-        DOM.signUpConfirmPassword.addEventListener('keyup', Action.checkPasswordMatch);
-        DOM.signUpForm.addEventListener('submit', Action.signUp);
-        DOM.signInForm.addEventListener('submit', Action.signIn);
-        DOM.signInUsername.addEventListener('focus', function () { return Action.toggleSignInUsernameError(false); });
-        DOM.signInPassword.addEventListener('focus', function () { return Action.toggleSignInPasswordError(false); });
-        DOM.signUpUsername.addEventListener('focus', function () { return Action.toggleSignUpUsernameError(false); });
-        DOM.signUpEmail.addEventListener('focus', function () { return Action.toggleSignUpMailError(false); });
-        DOM.signUpPassword.addEventListener('focus', function () { return Action.toggleSignUpPasswordError(false); });
-        DOM.signUpConfirmPassword.addEventListener('focus', function () { return Action.toggleSignUpPasswordCheckError(false); });
-    }
-    DOM.homeBtn.addEventListener('click', Action.goBackHome);
+    document.addEventListener('click', function (event) {
+        // ALERTS
+        deleteSuccessAlert(event);
+        deleteErrorAlert(event);
+        // INDEX NAVBAR
+        toggleSignIn(event);
+        toggleSignUp(event);
+        indexSignOut(event);
+        indexGoToDashboard(event);
+    });
+    document.addEventListener('keyup', function (event) {
+        // SIGNUP
+        handleSignUpUsername(event);
+        handleSignUpEmail(event);
+        handleSignUpPassword(event);
+        handleSignUpPasswordConfirm(event);
+        // SIGNIN
+        handleSignInUsername(event);
+        handleSignInPassword(event);
+    });
+    document.addEventListener('submit', function (event) {
+        handleSignUpSubmit(event);
+        handleSignInSubmit(event);
+    });
+    document.addEventListener('change', function (event) {
+        handleSignInRemember(event);
+    });
+    Index.render();
+    IndexNavbar.render();
 });

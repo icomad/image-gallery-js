@@ -4,6 +4,9 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.JsonObject;
+
 import java.io.IOException;
 
 @WebFilter(filterName = "UserSignedFilter")
@@ -15,9 +18,11 @@ public class UserSignedFilter implements Filter {
         var request = (HttpServletRequest) req;
         var response = (HttpServletResponse) resp;
         var session = request.getSession();
-        var contextPath = request.getServletContext().getContextPath();
         if (session.isNew() || session.getAttribute("user") == null) {
-            response.sendRedirect(contextPath);
+            var json = new JsonObject();
+            json.addProperty("error", "Error! You are not signed in!");
+            response.getWriter().print(json);
+            response.getWriter().flush();
             return;
         }
         chain.doFilter(req, resp);
