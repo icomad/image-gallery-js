@@ -1,6 +1,7 @@
 interface IndexData {
 	showSuccess: boolean;
 	showError: boolean;
+	showIndex: boolean;
 }
 
 interface IndexNavbarData {

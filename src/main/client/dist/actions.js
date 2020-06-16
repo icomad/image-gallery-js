@@ -333,6 +333,7 @@ export function toggleSignIn(e) {
         return;
     Index.attach(SignIn);
     Index.detach(SignUp);
+    Index.data.showIndex = false;
     Index.render();
 }
 export function toggleSignUp(e) {
@@ -343,6 +344,7 @@ export function toggleSignUp(e) {
         return;
     Index.attach(SignUp);
     Index.detach(SignIn);
+    Index.data.showIndex = false;
     Index.render();
 }
 export function indexSignOut(e) {

@@ -231,6 +231,7 @@ export function toggleSignIn(e: Event) {
 	if (IndexNavbar.data.isLogged) return;
 	Index.attach(SignIn);
 	Index.detach(SignUp);
+	Index.data.showIndex = false;
 	Index.render();
 }
 
@@ -242,6 +243,7 @@ export function toggleSignUp(e: Event) {
 
 	Index.attach(SignUp);
 	Index.detach(SignIn);
+	Index.data.showIndex = false;
 	Index.render();
 }
 
