@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && rollup --config rollup.index.config.js && rollup --config rollup.app.config.js",
+    "build": "yarn build:css && tsc && rollup --config rollup.index.config.js && rollup --config rollup.app.config.js",
     "build:css": "postcss styles/tailwind.css -o ../webapp/resources/css/main.css",
     "watch:css": "postcss styles/tailwind.css -o ../webapp/resources/css/main.css --watch"
   },
