@@ -1,6 +1,6 @@
 import Yogurt from '../yogurt';
 
-const data: SignInData = {
+const state: SignInState = {
 	username: '',
 	password: '',
 	usernameError: '',
@@ -9,7 +9,7 @@ const data: SignInData = {
 	remember: false,
 }
 
-const template = (props: SignInData) => `
+const template = (props: SignInState) => `
 	<div class="w-full flex justify-center">
 	<div class="w-full md:w-1/2 mt-12 rounded p-4 shadow-xl flex flex-col bg-blue-600">
 		<div class="text-xl border-b-2 border-gray-200 mb-8 p-2 text-gray-200">Sign In</div>
@@ -31,9 +31,9 @@ const template = (props: SignInData) => `
 	</div>
 `
 
-const SignIn = new Yogurt<SignInData>({
+const SignIn = new Yogurt<SignInState>({
 	selector: '#signin-section',
-	data,
+	state,
 	template,
 });
 

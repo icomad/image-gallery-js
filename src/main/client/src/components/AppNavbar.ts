@@ -2,7 +2,7 @@ import App from "./App";
 import Yogurt from "../yogurt";
 import { contextPath } from "../utils";
 
-const data: AppNavbar = {
+const state: AppNavbar = {
 	isLogged: false
 }
 
@@ -24,9 +24,9 @@ const template: Template<AppNavbar> = (props) => `
 
 const AppNavbar = new Yogurt<AppNavbar>({
 	selector: '#app-navbar',
-	data,
+	state,
 	template,
-	attachTo: App
+	childOf: App
 });
 
 export default AppNavbar;

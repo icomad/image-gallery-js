@@ -88,44 +88,44 @@ export function handleSignUpUsername(e) {
     var elem = e.target;
     if (!elem.matches('#username-signup'))
         return;
-    SignUp.data.username = elem.value;
+    SignUp.state.username = elem.value;
 }
 export function handleSignUpEmail(e) {
     var elem = e.target;
     if (!elem.matches('#email-signup'))
         return;
-    SignUp.data.email = elem.value;
-    if (!validateEmail(SignUp.data.email))
-        SignUp.data.emailError = 'Enter a valid email address!';
+    SignUp.state.email = elem.value;
+    if (!validateEmail(SignUp.state.email))
+        SignUp.state.emailError = 'Enter a valid email address!';
     else
-        SignUp.data.emailError = '';
+        SignUp.state.emailError = '';
 }
 export function handleSignUpPassword(e) {
     var elem = e.target;
     if (!elem.matches('#password-signup'))
         return;
-    SignUp.data.password = elem.value;
-    if (SignUp.data.password !== SignUp.data.passwordConfirm) {
-        SignUp.data.passwordConfirmError = 'Passwords do not match';
-        SignUp.data.passwordError = 'Passwords do not match';
+    SignUp.state.password = elem.value;
+    if (SignUp.state.password !== SignUp.state.passwordConfirm) {
+        SignUp.state.passwordConfirmError = 'Passwords do not match';
+        SignUp.state.passwordError = 'Passwords do not match';
     }
     else {
-        SignUp.data.passwordConfirmError = '';
-        SignUp.data.passwordError = '';
+        SignUp.state.passwordConfirmError = '';
+        SignUp.state.passwordError = '';
     }
 }
 export function handleSignUpPasswordConfirm(e) {
     var elem = e.target;
     if (!elem.matches('#confirm-password-signup'))
         return;
-    SignUp.data.passwordConfirm = elem.value;
-    if (SignUp.data.password !== SignUp.data.passwordConfirm) {
-        SignUp.data.passwordConfirmError = 'Passwords do not match';
-        SignUp.data.passwordError = 'Passwords do not match';
+    SignUp.state.passwordConfirm = elem.value;
+    if (SignUp.state.password !== SignUp.state.passwordConfirm) {
+        SignUp.state.passwordConfirmError = 'Passwords do not match';
+        SignUp.state.passwordError = 'Passwords do not match';
     }
     else {
-        SignUp.data.passwordConfirmError = '';
-        SignUp.data.passwordError = '';
+        SignUp.state.passwordConfirmError = '';
+        SignUp.state.passwordError = '';
     }
 }
 export function handleSignUpSubmit(e) {
@@ -138,13 +138,13 @@ export function handleSignUpSubmit(e) {
                     if (!elem.matches('#signup-form'))
                         return [2 /*return*/];
                     e.preventDefault();
-                    if (IndexNavbar.data.isLogged)
+                    if (IndexNavbar.state.isLogged)
                         return [2 /*return*/];
                     body = new FormData();
-                    body.append('username', SignUp.data.username);
-                    body.append('password', SignUp.data.password);
-                    body.append('email', SignUp.data.email);
-                    body.append('passwordCheck', SignUp.data.passwordConfirm);
+                    body.append('username', SignUp.state.username);
+                    body.append('password', SignUp.state.password);
+                    body.append('email', SignUp.state.email);
+                    body.append('passwordCheck', SignUp.state.passwordConfirm);
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 11, , 12]);
@@ -163,47 +163,47 @@ export function handleSignUpSubmit(e) {
                 case 4:
                     user = _b.sent();
                     sessionStorage.setItem('user', JSON.stringify(user));
-                    SignUp.data.username = '';
-                    SignUp.data.email = '';
-                    SignUp.data.password = '';
-                    SignUp.data.passwordConfirm = '';
-                    SignUp.data.usernameError = '';
-                    SignUp.data.emailError = '';
-                    SignUp.data.passwordError = '';
-                    SignUp.data.passwordConfirmError = '';
-                    SignUp.data.genericError = false;
+                    SignUp.state.username = '';
+                    SignUp.state.email = '';
+                    SignUp.state.password = '';
+                    SignUp.state.passwordConfirm = '';
+                    SignUp.state.usernameError = '';
+                    SignUp.state.emailError = '';
+                    SignUp.state.passwordError = '';
+                    SignUp.state.passwordConfirmError = '';
+                    SignUp.state.genericError = false;
                     document.querySelector('#signup-form').reset();
                     window.location.href = contextPath + "/app.html";
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    SignUp.data.genericError = false;
+                    SignUp.state.genericError = false;
                     if (error.field === 'username')
-                        SignUp.data.usernameError = error.error;
+                        SignUp.state.usernameError = error.error;
                     else if (error.field === 'password')
-                        SignUp.data.passwordError = error.error;
+                        SignUp.state.passwordError = error.error;
                     else if (error.field === 'email')
-                        SignUp.data.emailError = error.error;
+                        SignUp.state.emailError = error.error;
                     else if (error.field === 'confirmPassword')
-                        SignUp.data.passwordConfirmError = error.error;
+                        SignUp.state.passwordConfirmError = error.error;
                     return [2 /*return*/];
                 case 7: return [4 /*yield*/, response.json()];
                 case 8:
                     err = _b.sent();
-                    SignUp.data.passwordError = '';
-                    SignUp.data.usernameError = '';
-                    SignUp.data.genericError = true;
-                    ErrorAlert.data.message = err.error;
-                    Index.data.showError = true;
+                    SignUp.state.passwordError = '';
+                    SignUp.state.usernameError = '';
+                    SignUp.state.genericError = true;
+                    ErrorAlert.state.message = err.error;
+                    Index.state.showError = true;
                     Index.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 9: return [3 /*break*/, 10];
                 case 10: return [3 /*break*/, 12];
                 case 11:
                     error_1 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    Index.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    Index.state.showError = true;
                     Index.attach(ErrorAlert);
                     console.error(error_1);
                     return [3 /*break*/, 12];
@@ -221,19 +221,19 @@ export function handleSignInUsername(e) {
     var elem = e.target;
     if (!elem.matches('#username-signin'))
         return;
-    SignIn.data.username = elem.value;
+    SignIn.state.username = elem.value;
 }
 export function handleSignInPassword(e) {
     var elem = e.target;
     if (!elem.matches('#password-signin'))
         return;
-    SignIn.data.password = elem.value;
+    SignIn.state.password = elem.value;
 }
 export function handleSignInRemember(e) {
     var elem = e.target;
     if (!elem.matches('#remember-signin'))
         return;
-    SignIn.data.remember = elem.checked;
+    SignIn.state.remember = elem.checked;
 }
 export function handleSignInSubmit(e) {
     return __awaiter(this, void 0, void 0, function () {
@@ -245,11 +245,11 @@ export function handleSignInSubmit(e) {
                     if (!elem.matches('#signin-form'))
                         return [2 /*return*/];
                     e.preventDefault();
-                    if (IndexNavbar.data.isLogged)
+                    if (IndexNavbar.state.isLogged)
                         return [2 /*return*/];
                     body = new FormData();
-                    body.append('username', SignIn.data.username);
-                    body.append('password', SignIn.data.password);
+                    body.append('username', SignIn.state.username);
+                    body.append('password', SignIn.state.password);
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 11, , 12]);
@@ -268,50 +268,50 @@ export function handleSignInSubmit(e) {
                 case 4:
                     user = _b.sent();
                     sessionStorage.setItem('user', JSON.stringify(user));
-                    if (SignIn.data.remember) {
+                    if (SignIn.state.remember) {
                         userWithExpiration = {
                             user: user,
                             expiry: new Date().getTime() + 1000 * 60 * 60 * 12,
                         };
                         localStorage.setItem('user', JSON.stringify(userWithExpiration));
                     }
-                    IndexNavbar.data.isLogged = true;
-                    SignIn.data.username = '';
-                    SignIn.data.password = '';
-                    SignIn.data.usernameError = '';
-                    SignIn.data.passwordError = '';
-                    SignIn.data.genericError = false;
-                    SignIn.data.remember = false;
+                    IndexNavbar.state.isLogged = true;
+                    SignIn.state.username = '';
+                    SignIn.state.password = '';
+                    SignIn.state.usernameError = '';
+                    SignIn.state.passwordError = '';
+                    SignIn.state.genericError = false;
+                    SignIn.state.remember = false;
                     document.querySelector('#signin-form').reset();
                     window.location.href = contextPath + "/app.html";
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    SignIn.data.genericError = false;
+                    SignIn.state.genericError = false;
                     if (error.field === 'username') {
-                        SignIn.data.usernameError = error.error;
+                        SignIn.state.usernameError = error.error;
                     }
                     else if (error.field === 'password') {
-                        SignIn.data.passwordError = error.error;
+                        SignIn.state.passwordError = error.error;
                     }
                     return [2 /*return*/];
                 case 7: return [4 /*yield*/, response.json()];
                 case 8:
                     err = _b.sent();
-                    SignIn.data.passwordError = '';
-                    SignIn.data.usernameError = '';
-                    SignIn.data.genericError = true;
-                    ErrorAlert.data.message = err.error;
-                    Index.data.showError = true;
+                    SignIn.state.passwordError = '';
+                    SignIn.state.usernameError = '';
+                    SignIn.state.genericError = true;
+                    ErrorAlert.state.message = err.error;
+                    Index.state.showError = true;
                     Index.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 9: return [3 /*break*/, 10];
                 case 10: return [3 /*break*/, 12];
                 case 11:
                     error_2 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    Index.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    Index.state.showError = true;
                     Index.attach(ErrorAlert);
                     console.error(error_2);
                     return [3 /*break*/, 12];
@@ -329,22 +329,22 @@ export function toggleSignIn(e) {
     var elem = e.target;
     if (!elem.matches('#signin-nav'))
         return;
-    if (IndexNavbar.data.isLogged)
+    if (IndexNavbar.state.isLogged)
         return;
     Index.attach(SignIn);
     Index.detach(SignUp);
-    Index.data.showIndex = false;
+    Index.state.showIndex = false;
     Index.render();
 }
 export function toggleSignUp(e) {
     var elem = e.target;
     if (!elem.matches('#signup-nav'))
         return;
-    if (IndexNavbar.data.isLogged)
+    if (IndexNavbar.state.isLogged)
         return;
     Index.attach(SignUp);
     Index.detach(SignIn);
-    Index.data.showIndex = false;
+    Index.state.showIndex = false;
     Index.render();
 }
 export function indexSignOut(e) {
@@ -356,7 +356,7 @@ export function indexSignOut(e) {
                     elem = e.target;
                     if (!elem.matches('#signout-btn'))
                         return [2 /*return*/];
-                    if (!IndexNavbar.data.isLogged)
+                    if (!IndexNavbar.state.isLogged)
                         return [2 /*return*/];
                     _a.label = 1;
                 case 1:
@@ -367,16 +367,16 @@ export function indexSignOut(e) {
                     if (response.status === 200) {
                         sessionStorage.removeItem('user');
                         localStorage.removeItem('user');
-                        SuccessAlert.data.message = 'You successfully signed out!';
-                        Index.data.showSuccess = true;
+                        SuccessAlert.state.message = 'You successfully signed out!';
+                        Index.state.showSuccess = true;
                         Index.attach(SuccessAlert);
                         window.location.href = contextPath;
                     }
                     return [3 /*break*/, 4];
                 case 3:
                     error_3 = _a.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    Index.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    Index.state.showError = true;
                     Index.attach(ErrorAlert);
                     console.error(error_3);
                     return [3 /*break*/, 4];
@@ -389,7 +389,7 @@ export function indexGoToDashboard(e) {
     var elem = e.target;
     if (!elem.matches('#dashboard-btn'))
         return;
-    if (!IndexNavbar.data.isLogged)
+    if (!IndexNavbar.state.isLogged)
         return;
     window.location.href = contextPath + "/app.html";
 }
@@ -416,21 +416,21 @@ export function appSignOut(e) {
                     if (response.status === 200) {
                         sessionStorage.removeItem('user');
                         localStorage.removeItem('user');
-                        SuccessAlert.data.message = 'You successfully signed out!';
-                        App.data.showSuccess = true;
+                        SuccessAlert.state.message = 'You successfully signed out!';
+                        App.state.showSuccess = true;
                         App.attach(SuccessAlert);
                         window.location.href = contextPath;
                     }
                     else {
-                        ErrorAlert.data.message = 'Something went wrong!';
-                        App.data.showError = true;
+                        ErrorAlert.state.message = 'Something went wrong!';
+                        App.state.showError = true;
                         App.attach(ErrorAlert);
                     }
                     return [3 /*break*/, 4];
                 case 3:
                     error_4 = _a.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     console.error(error_4);
                     return [3 /*break*/, 4];
@@ -443,9 +443,9 @@ export function appGoToDashboard(e) {
     var elem = e.target;
     if (!elem.matches('#dashboard-nav'))
         return;
-    App.data.showDashboard = true;
-    App.data.showAlbum = false;
-    App.data.currentAlbum = null;
+    App.state.showDashboard = true;
+    App.state.showAlbum = false;
+    App.state.currentAlbum = null;
 }
 /**
  *
@@ -456,12 +456,12 @@ export function deleteErrorAlert(e) {
     var elem = e.target;
     if (!elem.matches('#error-alert-delete'))
         return;
-    if (!IndexNavbar.data.isLogged && AppNavbar.data.isLogged) {
-        App.data.showError = false;
+    if (!IndexNavbar.state.isLogged && AppNavbar.state.isLogged) {
+        App.state.showError = false;
         App.detach(ErrorAlert);
     }
     else {
-        Index.data.showError = false;
+        Index.state.showError = false;
         Index.detach(ErrorAlert);
     }
 }
@@ -474,12 +474,12 @@ export function deleteSuccessAlert(e) {
     var elem = e.target;
     if (!elem.matches('#success-alert-delete'))
         return;
-    if (!IndexNavbar.data.isLogged && AppNavbar.data.isLogged) {
-        App.data.showSuccess = false;
+    if (!IndexNavbar.state.isLogged && AppNavbar.state.isLogged) {
+        App.state.showSuccess = false;
         App.detach(SuccessAlert);
     }
     else {
-        Index.data.showSuccess = false;
+        Index.state.showSuccess = false;
         Index.detach(SuccessAlert);
     }
 }
@@ -495,9 +495,9 @@ export function retrieveAlbums(e) {
             switch (_b.label) {
                 case 0:
                     elem = e.target;
-                    if (!elem.matches('#album-grid') || AlbumGrid.data.attempted)
+                    if (!elem.matches('#album-grid') || AlbumGrid.state.attempted)
                         return [2 /*return*/];
-                    AlbumGrid.data.attempted = true;
+                    AlbumGrid.state.attempted = true;
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 9, , 10]);
@@ -513,22 +513,22 @@ export function retrieveAlbums(e) {
                 case 3: return [4 /*yield*/, response.json()];
                 case 4:
                     albums = _b.sent();
-                    AlbumGrid.data.albums = __spread(albums);
+                    AlbumGrid.state.albums = __spread(albums);
                     sortableGrid(document.getElementById('album-grid'), function () { return updateOrder(); });
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    ErrorAlert.data.message = 'OPS! Something went wrong! ' + error.error;
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'OPS! Something went wrong! ' + error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 7: return [3 /*break*/, 8];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_5 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     console.error(error_5);
                     return [3 /*break*/, 10];
@@ -554,7 +554,7 @@ function updateOrder() {
                                     body = new FormData();
                                     body.append('albumId', id);
                                     body.append('newOrder', newOrder);
-                                    alb = AlbumGrid.data.albums.find(function (album) { return album.id === parseInt(id); });
+                                    alb = AlbumGrid.state.albums.find(function (album) { return album.id === parseInt(id); });
                                     alb.order = parseInt(newOrder);
                                     _a.label = 1;
                                 case 1:
@@ -566,8 +566,8 @@ function updateOrder() {
                                     return [4 /*yield*/, response.json()];
                                 case 3:
                                     error = _a.sent();
-                                    ErrorAlert.data.message = 'OPS! Something went wrong! ' + error.error;
-                                    App.data.showError = true;
+                                    ErrorAlert.state.message = 'OPS! Something went wrong! ' + error.error;
+                                    App.state.showError = true;
                                     App.attach(ErrorAlert);
                                     return [2 /*return*/, "continue"];
                                 case 4: return [4 /*yield*/, response.json()];
@@ -576,8 +576,8 @@ function updateOrder() {
                                     return [3 /*break*/, 7];
                                 case 6:
                                     error_6 = _a.sent();
-                                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                                    App.data.showError = true;
+                                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                                    App.state.showError = true;
                                     App.attach(ErrorAlert);
                                     console.error(error_6);
                                     return [3 /*break*/, 7];
@@ -626,7 +626,7 @@ export function openAlbum(e) {
                     if (!elem.matches('.album'))
                         return [2 /*return*/];
                     albumId = parseInt(elem.dataset.id);
-                    album = AlbumGrid.data.albums.find(function (a) { return a.id === albumId; });
+                    album = AlbumGrid.state.albums.find(function (a) { return a.id === albumId; });
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 9, , 10]);
@@ -644,23 +644,23 @@ export function openAlbum(e) {
                 case 4:
                     images = _b.sent();
                     albumDetailComponent = makeAlbumDetailComponent(album, images);
-                    App.data.currentAlbum = albumDetailComponent;
-                    App.data.showDashboard = false;
-                    App.data.showAlbum = true;
+                    App.state.currentAlbum = albumDetailComponent;
+                    App.state.showDashboard = false;
+                    App.state.showAlbum = true;
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! ' + error.error;
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! ' + error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 7: return [3 /*break*/, 8];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_7 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     console.error(error_7);
                     return [3 /*break*/, 10];
@@ -678,7 +678,7 @@ export function handleAddAlbumTitle(e) {
     var elem = e.target;
     if (!elem.matches('#add-album-title'))
         return;
-    AddAlbumForm.data.albumTitle = elem.value;
+    AddAlbumForm.state.albumTitle = elem.value;
 }
 export function addAlbum(e) {
     return __awaiter(this, void 0, void 0, function () {
@@ -691,7 +691,7 @@ export function addAlbum(e) {
                         return [2 /*return*/];
                     e.preventDefault();
                     body = new FormData();
-                    body.append('title', AddAlbumForm.data.albumTitle);
+                    body.append('title', AddAlbumForm.state.albumTitle);
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 9, , 10]);
@@ -708,27 +708,27 @@ export function addAlbum(e) {
                 case 3: return [4 /*yield*/, response.json()];
                 case 4:
                     album = _b.sent();
-                    AlbumGrid.data.albums.push(album);
-                    AddAlbumForm.data.albumTitle = '';
-                    AddAlbumForm.data.albumTitleError = '';
-                    AddAlbumForm.data.genericError = false;
+                    AlbumGrid.state.albums.push(album);
+                    AddAlbumForm.state.albumTitle = '';
+                    AddAlbumForm.state.albumTitleError = '';
+                    AddAlbumForm.state.genericError = false;
                     document.querySelector('#add-album-form').reset();
                     AlbumGrid.render();
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    AddAlbumForm.data.genericError = true;
-                    ErrorAlert.data.message = error.error;
-                    App.data.showError = true;
+                    AddAlbumForm.state.genericError = true;
+                    ErrorAlert.state.message = error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 7: return [3 /*break*/, 8];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_8 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     console.error(error_8);
                     return [3 /*break*/, 10];
@@ -746,27 +746,27 @@ export function handleAddImageTitle(e) {
     var elem = e.target;
     if (!elem.matches('#add-image-title'))
         return;
-    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm)
+    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageForm)
         return;
-    App.data.currentAlbum.data.imageForm.data.title = elem.value;
+    App.state.currentAlbum.state.imageForm.state.title = elem.value;
 }
 export function handleAddImageDescription(e) {
     var elem = e.target;
     if (!elem.matches('#add-image-description'))
         return;
-    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm)
+    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageForm)
         return;
-    App.data.currentAlbum.data.imageForm.data.description = elem.value;
+    App.state.currentAlbum.state.imageForm.state.description = elem.value;
 }
 export function handleAddImageFile(e) {
     var elem = e.target;
     if (!elem.matches('#add-image-file'))
         return;
-    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm)
+    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageForm)
         return;
     if (elem.files === null)
         return;
-    App.data.currentAlbum.data.imageForm.data.file = elem.files[0];
+    App.state.currentAlbum.state.imageForm.state.file = elem.files[0];
 }
 export function addImage(e) {
     var _a;
@@ -779,17 +779,17 @@ export function addImage(e) {
                     if (!elem.matches('#add-image-form'))
                         return [2 /*return*/];
                     e.preventDefault();
-                    LoadingModal.data.showModal = true;
-                    LoadingModal.data.text = 'Uploading image...';
+                    LoadingModal.state.showModal = true;
+                    LoadingModal.state.text = 'Uploading image...';
                     document.querySelector('body').style.pointerEvents = 'none';
-                    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageForm)
+                    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageForm)
                         return [2 /*return*/];
-                    form = App.data.currentAlbum.data.imageForm;
+                    form = App.state.currentAlbum.state.imageForm;
                     body = new FormData();
-                    body.append('albumId', form.data.albumId.toString());
-                    body.append('title', form.data.title);
-                    body.append('description', form.data.description);
-                    body.append('imageFile', form.data.file, (_a = form.data.file) === null || _a === void 0 ? void 0 : _a.name);
+                    body.append('albumId', form.state.albumId.toString());
+                    body.append('title', form.state.title);
+                    body.append('description', form.state.description);
+                    body.append('imageFile', form.state.file, (_a = form.state.file) === null || _a === void 0 ? void 0 : _a.name);
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 9, , 10]);
@@ -806,33 +806,33 @@ export function addImage(e) {
                 case 3: return [4 /*yield*/, response.json()];
                 case 4:
                     image = _c.sent();
-                    App.data.currentAlbum.data.images.push(image);
-                    App.data.currentAlbum.render();
-                    form.data.description = '';
-                    form.data.title = '';
-                    form.data.file = null;
+                    App.state.currentAlbum.state.images.push(image);
+                    App.state.currentAlbum.render();
+                    form.state.description = '';
+                    form.state.title = '';
+                    form.state.file = null;
                     document.querySelector('#add-image-form').reset();
-                    LoadingModal.data.showModal = false;
+                    LoadingModal.state.showModal = false;
                     document.querySelector('body').style.pointerEvents = 'auto';
-                    App.data.currentAlbum.data.imageGrid.data.page = 1;
+                    App.state.currentAlbum.state.imageGrid.state.page = 1;
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _c.sent();
-                    ErrorAlert.data.message = 'Something went wrong! ' + error.error;
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! ' + error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
-                    LoadingModal.data.showModal = false;
+                    LoadingModal.state.showModal = false;
                     document.querySelector('body').style.pointerEvents = 'auto';
                     return [2 /*return*/];
                 case 7: return [2 /*return*/];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_9 = _c.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
-                    LoadingModal.data.showModal = false;
+                    LoadingModal.state.showModal = false;
                     document.querySelector('body').style.pointerEvents = 'auto';
                     console.error(error_9);
                     return [3 /*break*/, 10];
@@ -850,17 +850,17 @@ export function nextPage(e) {
     var elem = e.target;
     if (!elem.matches('#next-page-btn'))
         return;
-    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageGrid)
+    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageGrid)
         return;
-    App.data.currentAlbum.data.imageGrid.data.page += 1;
+    App.state.currentAlbum.state.imageGrid.state.page += 1;
 }
 export function prevPage(e) {
     var elem = e.target;
     if (!elem.matches('#prev-page-btn'))
         return;
-    if (!App.data.currentAlbum || !App.data.currentAlbum.data.imageGrid)
+    if (!App.state.currentAlbum || !App.state.currentAlbum.state.imageGrid)
         return;
-    App.data.currentAlbum.data.imageGrid.data.page -= 1;
+    App.state.currentAlbum.state.imageGrid.state.page -= 1;
 }
 export function openImage(e) {
     var _a;
@@ -872,7 +872,7 @@ export function openImage(e) {
                     elem = e.target;
                     if (!('matches' in elem) || !elem.matches('.image'))
                         return [2 /*return*/];
-                    image = (_a = App.data.currentAlbum) === null || _a === void 0 ? void 0 : _a.data.images.find(function (img) { return img.id === parseInt(elem.dataset.id); });
+                    image = (_a = App.state.currentAlbum) === null || _a === void 0 ? void 0 : _a.state.images.find(function (img) { return img.id === parseInt(elem.dataset.id); });
                     if (image === undefined)
                         return [2 /*return*/];
                     _c.label = 1;
@@ -892,22 +892,22 @@ export function openImage(e) {
                 case 4:
                     comments = _c.sent();
                     imageDetailComponent = makeImageDetailComponent(image, comments);
-                    App.data.currentImage = imageDetailComponent;
-                    App.data.showImage = true;
+                    App.state.currentImage = imageDetailComponent;
+                    App.state.showImage = true;
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _c.sent();
-                    ErrorAlert.data.message = 'Something went wrong! ' + error.error;
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! ' + error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     return [2 /*return*/];
                 case 7: return [2 /*return*/];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_10 = _c.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
                     console.error(error_10);
                     return [3 /*break*/, 10];
@@ -925,27 +925,27 @@ export function closeModal(e) {
     var elem = e.target;
     if (!elem.matches('#image-detail-modal'))
         return;
-    App.data.showImage = false;
-    App.data.currentImage = null;
+    App.state.showImage = false;
+    App.state.currentImage = null;
 }
 export function handleAddCommentBody(e) {
     var elem = e.target;
     if (!elem.matches('#add-comment-body'))
         return;
-    if (!App.data.currentImage)
+    if (!App.state.currentImage)
         return;
-    App.data.currentImage.data.commentBody = elem.value;
+    App.state.currentImage.state.commentBody = elem.value;
 }
 export function onCommentInputFocus(e) {
     var elem = e.target;
     if (!elem.matches('#add-comment-body'))
         return;
-    if (!App.data.currentImage)
+    if (!App.state.currentImage)
         return;
-    if (!App.data.currentImage.data.commentBodyError)
+    if (!App.state.currentImage.state.commentBodyError)
         return;
     elem.value = '';
-    App.data.currentImage.data.commentBodyError = false;
+    App.state.currentImage.state.commentBodyError = false;
 }
 export function addComment(e) {
     return __awaiter(this, void 0, void 0, function () {
@@ -956,20 +956,20 @@ export function addComment(e) {
                     elem = e.target;
                     if (!elem.matches('#add-comment-form'))
                         return [2 /*return*/];
-                    if (!App.data.currentImage)
+                    if (!App.state.currentImage)
                         return [2 /*return*/];
                     e.preventDefault();
-                    imageDetail = App.data.currentImage;
-                    if (imageDetail.data.commentBody.trim() === '') {
-                        imageDetail.data.commentBodyError = true;
+                    imageDetail = App.state.currentImage;
+                    if (imageDetail.state.commentBody.trim() === '') {
+                        imageDetail.state.commentBodyError = true;
                         input = document.querySelector('#add-comment-body');
                         input.value = 'You cannot send empty message!';
                         return [2 /*return*/];
                     }
                     body = new FormData();
-                    console.log(imageDetail.data.commentBody);
-                    body.append('body', imageDetail.data.commentBody);
-                    body.append('imageId', imageDetail.data.image.id.toString());
+                    console.log(imageDetail.state.commentBody);
+                    body.append('body', imageDetail.state.commentBody);
+                    body.append('imageId', imageDetail.state.image.id.toString());
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 9, , 10]);
@@ -986,29 +986,29 @@ export function addComment(e) {
                 case 3: return [4 /*yield*/, response.json()];
                 case 4:
                     comment = _b.sent();
-                    imageDetail.data.comments.push(comment);
+                    imageDetail.state.comments.push(comment);
                     imageDetail.render();
-                    imageDetail.data.commentBody = '';
+                    imageDetail.state.commentBody = '';
                     document.querySelector('#add-comment-form').reset();
                     return [2 /*return*/];
                 case 5: return [4 /*yield*/, response.json()];
                 case 6:
                     error = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! ' + error.error;
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! ' + error.error;
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
-                    App.data.showImage = false;
-                    App.data.currentImage = null;
+                    App.state.showImage = false;
+                    App.state.currentImage = null;
                     return [2 /*return*/];
                 case 7: return [3 /*break*/, 8];
                 case 8: return [3 /*break*/, 10];
                 case 9:
                     error_11 = _b.sent();
-                    ErrorAlert.data.message = 'Something went wrong! Possible network error!';
-                    App.data.showError = true;
+                    ErrorAlert.state.message = 'Something went wrong! Possible network error!';
+                    App.state.showError = true;
                     App.attach(ErrorAlert);
-                    App.data.showImage = false;
-                    App.data.currentImage = null;
+                    App.state.showImage = false;
+                    App.state.currentImage = null;
                     console.error(error_11);
                     return [3 /*break*/, 10];
                 case 10: return [2 /*return*/];

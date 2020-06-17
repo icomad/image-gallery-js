@@ -1,14 +1,14 @@
 import Yogurt from "../yogurt";
 
-function makeAddImageFormComponent(albumId: number, component: IYogurt<AlbumDetailData>){
-	const data: AddImageData = {
+function makeAddImageFormComponent(albumId: number, component: IYogurt<AlbumDetailState>){
+	const state: AddImageState = {
 		albumId,
 		file: null,
 		description: '',
 		title: ''
 	}
 
-	const template: Template<AddImageData> = (props) => `
+	const template: Template<AddImageState> = (props) => `
 		<div class="rounded p-2 shadow-xl flex flex-col bg-blue-600">
 			<div class="text-xl border-b-2 border-gray-200 mb-4 py-1 px-8 text-gray-200">Add Image</div>
 			<form id="add-image-form" action="#" class="flex flex-col">
@@ -20,11 +20,11 @@ function makeAddImageFormComponent(albumId: number, component: IYogurt<AlbumDeta
 		</div>
 	`;
 
-	const AddImageForm = new Yogurt<AddImageData>({
+	const AddImageForm = new Yogurt<AddImageState>({
 		selector: '#add-image-section',
-		data,
+		state,
 		template,
-		attachTo: component
+		childOf: component
 	});
 
 	AddImageForm.render();

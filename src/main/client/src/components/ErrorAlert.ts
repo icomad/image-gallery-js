@@ -1,10 +1,10 @@
 import Yogurt from '../yogurt';
 
-const data: ErrorData = {
+const state: ErrorState = {
 	message: ''
 }
 
-const template: Template<ErrorData> = (props) => `
+const template: Template<ErrorState> = (props) => `
 	<div class="w-full md:w-1/2" role="alert" >
 		<div class="bg-red-500 text-white font-bold rounded-t px-4 py-2 flex justify-between">
 			<span class="flex-grow font-bold">ERROR!</span>
@@ -16,9 +16,9 @@ const template: Template<ErrorData> = (props) => `
 	</div>
 ` 
 
-const ErrorAlert = new Yogurt<ErrorData>({
+const ErrorAlert = new Yogurt<ErrorState>({
 	selector: '#error-alert',
-	data,
+	state,
 	template,
 })
 

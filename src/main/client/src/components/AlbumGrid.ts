@@ -1,12 +1,12 @@
 import Dashboard from "./Dashboard";
 import Yogurt from "../yogurt";
 
-const data: AlbumGridData = {
+const state: AlbumGridState = {
 	albums: [] as Album[],
 	attempted: false
 }
 
-const template: Template<AlbumGridData> = (props) => !props.albums.length ? 
+const template: Template<AlbumGridState> = (props) => !props.albums.length ? 
 	`<div class="rounded shadow p-4 bg-yellow-500 text-gray-800 flex justify-center items-center" draggable="false">There are no albums to show. Add one using the form above.</div>` :
 	props.albums.sort((a, b) => b.order - a.order).map(album => `
 		<div id="album-${album.id}" data-id="${album.id}" data-order="${album.order}" class="album cursor-pointer shadow-lg flex flex-col p-2 rounded items-stretch bg-white text-gray-800 transition-default hover:bg-blue-200" draggable="true">
@@ -15,11 +15,11 @@ const template: Template<AlbumGridData> = (props) => !props.albums.length ?
 		</div>
 	`).join('')
 
-const AlbumGrid = new Yogurt<AlbumGridData>({
+const AlbumGrid = new Yogurt<AlbumGridState>({
 	selector: '#album-grid',
-	data,
+	state,
 	template,
-	attachTo: Dashboard
+	childOf: Dashboard
 });
 
 export default AlbumGrid;

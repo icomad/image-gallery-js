@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('mouseover', function (event) {
         openImage(event);
     });
-    AppNavbar.data.isLogged = true;
+    AppNavbar.state.isLogged = true;
     App.render();
     LoadingModal.render();
     AppNavbar.render();

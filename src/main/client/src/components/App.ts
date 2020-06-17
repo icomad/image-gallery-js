@@ -1,6 +1,6 @@
 import Yogurt from '../yogurt';
 
-const data: AppData = {
+const state: AppState = {
 	showError: false,
 	showSuccess: false,
 	showDashboard: true,
@@ -10,7 +10,7 @@ const data: AppData = {
 	currentImage: null,
 }
 
-const template: Template<AppData> = (props) => `
+const template: Template<AppState> = (props) => `
 	<div id='loading-modal'></div>
 	<header id="app-navbar" class='header'></header>
 	<main class="bg-gray-100 flex-grow">
@@ -24,9 +24,9 @@ const template: Template<AppData> = (props) => `
 	</main>
 `
 
-const App = new Yogurt<AppData>({
+const App = new Yogurt<AppState>({
 	selector: '#app',
-	data,
+	state,
 	template
 });
 

@@ -2,14 +2,14 @@ import Yogurt from "../yogurt";
 import App from "./App";
 
 export default function makeImageDetailComponent(image: Image, comments: CommentWithUsername[]){
-	const data: ImageDetailData = {
+	const state: ImageDetailState = {
 		image,
 		comments,
 		commentBody: '',
 		commentBodyError: false
 	}
 
-	const template: Template<ImageDetailData> = (props) => `
+	const template: Template<ImageDetailState> = (props) => `
 		<div id='image-detail-modal' class='w-full h-full flex justify-center items-center fixed block top-0 left-0 z-50' style="background: rgba(0, 0, 0, .45)">
 			<div class='p-8 rounded w-11/12 flex flex-col md:flex-row justify-between text-gray-800 bg-gray-100' style="max-height: 90vh;">
 				<div class="w-full md:w-2/3 flex flex-col justify-between">
@@ -57,11 +57,11 @@ export default function makeImageDetailComponent(image: Image, comments: Comment
 		</div>
 	`;
 
-	const ImageDetail = new Yogurt<ImageDetailData>({
+	const ImageDetail = new Yogurt<ImageDetailState>({
 		selector: '#image-detail-section',
-		data,
+		state,
 		template,
-		attachTo: App
+		childOf: App
 	});
 
 	ImageDetail.render();

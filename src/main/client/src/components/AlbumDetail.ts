@@ -4,14 +4,14 @@ import makeAddImageFormComponent from "./AddImageForm";
 import makeImageGridComponent from "./ImageGrid";
 
 function makeAlbumDetailComponent(album: Album, images: Image[]){
-	const data: AlbumDetailData = {
+	const state: AlbumDetailState = {
 		album,
 		images,
 		imageForm: null,
 		imageGrid: null,
 	}
 
-	const template: Template<AlbumDetailData> = (props) => `
+	const template: Template<AlbumDetailState> = (props) => `
 		<div id="album-section-title" class="mt-2 w-full flex justify-center items-center text-3xl font-semibold text-blue-800">${album.title}</div>
 		<div id='add-image-section' class="mt-6 w-full flex justify-center"></div>
 		<div class="my-6 w-full flex flex-wrap justify-between items-center">
@@ -20,20 +20,20 @@ function makeAlbumDetailComponent(album: Album, images: Image[]){
 		</div>
 	`;
 
-	const AlbumDetail = new Yogurt<AlbumDetailData>({
+	const AlbumDetail = new Yogurt<AlbumDetailState>({
 		selector: '#album-detail-section',
-		data,
+		state,
 		template,
-		attachTo: App
+		childOf: App
 	});
 
 	AlbumDetail.render();
 	
-	const AddImageForm = makeAddImageFormComponent(AlbumDetail.data.album.id, AlbumDetail);
-	AlbumDetail.data.imageForm = AddImageForm;
+	const AddImageForm = makeAddImageFormComponent(AlbumDetail.state.album.id, AlbumDetail);
+	AlbumDetail.state.imageForm = AddImageForm;
 
-	const ImageGrid = makeImageGridComponent(AlbumDetail.data.images, AlbumDetail);
-	AlbumDetail.data.imageGrid = ImageGrid;
+	const ImageGrid = makeImageGridComponent(AlbumDetail.state.images, AlbumDetail);
+	AlbumDetail.state.imageGrid = ImageGrid;
 
 	return AlbumDetail;
 }

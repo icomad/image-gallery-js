@@ -235,6 +235,8 @@ buildNumber.properties
 # client
 node_modules
 src/main/client/node_modules
+src/main/client/dist
+dist/
 
 # VSCode
 .vscode/

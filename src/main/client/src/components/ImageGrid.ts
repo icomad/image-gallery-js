@@ -1,12 +1,12 @@
 import Yogurt from "../yogurt";
 
-function makeImageGridComponent(images: Image[], component: IYogurt<AlbumDetailData>){
-	const data: ImageGridData = {
+function makeImageGridComponent(images: Image[], component: IYogurt<AlbumDetailState>){
+	const state: ImageGridState = {
 		images,
 		page: 1
 	}
 
-	const template: Template<ImageGridData> = (props) => !props.images.length ? 
+	const template: Template<ImageGridState> = (props) => !props.images.length ? 
 	`
 		<div class="w-full rounded shadow p-4 bg-yellow-500 text-gray-800 flex justify-center items-center">No images to show! Add one using the form above.</div>
 	` 
@@ -36,11 +36,11 @@ function makeImageGridComponent(images: Image[], component: IYogurt<AlbumDetailD
 		</div>
 	`
 
-	const ImageGrid = new Yogurt<ImageGridData>({
+	const ImageGrid = new Yogurt<ImageGridState>({
 		selector: '#image-grid',
-		data,
+		state,
 		template,
-		attachTo: component
+		childOf: component
 	});
 
 	ImageGrid.render();

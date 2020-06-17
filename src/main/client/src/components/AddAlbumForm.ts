@@ -1,13 +1,13 @@
 import Yogurt from "../yogurt"
 import Dashboard from "./Dashboard";
 
-const data: AddAlbumData = {
+const state: AddAlbumState = {
 	albumTitle: '',
 	albumTitleError: '',
 	genericError: false
 }
 
-const template: Template<AddAlbumData> = (props) => `
+const template: Template<AddAlbumState> = (props) => `
 	<div class="text-xl border-b-2 border-gray-200 mb-4 p-1 text-gray-200">Add New Album</div>
 	<form id="add-album-form" action="#" class="flex justify-between items-center">
 		<input id="add-album-title" type="text" maxlength="45" name="title" placeholder="Album Title" class="rounded p-2 flex-grow mr-4 ${props.albumTitleError || props.genericError ? 'border-2 border-red-600 outline-none' : ''}" required />
@@ -15,11 +15,11 @@ const template: Template<AddAlbumData> = (props) => `
 	</form>
 `
 
-const AddAlbumForm = new Yogurt<AddAlbumData>({
+const AddAlbumForm = new Yogurt<AddAlbumState>({
 	selector: '#add-album-section',
-	data,
+	state,
 	template,
-	attachTo: Dashboard
+	childOf: Dashboard
 });
 
 export default AddAlbumForm;

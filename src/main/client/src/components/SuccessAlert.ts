@@ -1,10 +1,10 @@
 import Yogurt from '../yogurt';
 
-const data: SuccessData = {
+const state: SuccessState = {
 	message: ''
 }
 
-const template: Template<SuccessData> = (props) => `
+const template: Template<SuccessState> = (props) => `
 	<div class="w-full md:w-1/2" role="alert" >
 		<div class="bg-green-500 text-white font-bold rounded-t px-4 py-2 flex justify-between">
 			<span class="flex-grow font-bold">SUCCESS!</span>
@@ -16,9 +16,9 @@ const template: Template<SuccessData> = (props) => `
 	</div>
 ` 
 
-const SuccessAlert = new Yogurt<SuccessData>({
+const SuccessAlert = new Yogurt<SuccessState>({
 	selector: '#success-alert',
-	data,
+	state,
 	template,
 })
 

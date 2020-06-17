@@ -1,14 +1,14 @@
-interface IndexData {
+interface IndexState {
 	showSuccess: boolean;
 	showError: boolean;
 	showIndex: boolean;
 }
 
-interface IndexNavbarData {
+interface IndexNavbarState {
 	isLogged: boolean;
 }
 
-interface SignInData {
+interface SignInState {
 	username: string;
 	password: string;
 	usernameError: string;
@@ -17,7 +17,7 @@ interface SignInData {
 	remember: boolean;
 }
 
-interface SignUpData {
+interface SignUpState {
 	username: string;
 	email: string;
 	password: string;
@@ -29,11 +29,11 @@ interface SignUpData {
 	genericError: boolean;
 }
 
-interface SuccessData {
+interface SuccessState {
 	message: string;
 }
 
-interface ErrorData {
+interface ErrorState {
 	message: string;
 }
 
@@ -51,14 +51,14 @@ interface GenericError {
 	error: string;
 }
 
-interface AppData {
+interface AppState {
 	showSuccess: boolean;
 	showError: boolean;
 	showDashboard: boolean;
 	showAlbum: boolean;
 	showImage: boolean;
-	currentAlbum: IYogurt<AlbumDetailData> | null;
-	currentImage: IYogurt<ImageDetailData> | null;
+	currentAlbum: IYogurt<AlbumDetailState> | null;
+	currentImage: IYogurt<ImageDetailState> | null;
 }
 
 interface AppNavbar {
@@ -73,9 +73,9 @@ interface Album {
 	userId: number;
 }
 
-interface DashboardData {}
+interface DashboardState {}
 
-interface AddAlbumData {
+interface AddAlbumState {
 	albumTitle: string;
 	albumTitleError: string;
 	genericError: boolean;
@@ -86,7 +86,7 @@ interface AlbumResponseError {
 	field: 'title';
 }
 
-interface AlbumGridData {
+interface AlbumGridState {
 	albums: Album[];
 	attempted: boolean;
 }
@@ -101,26 +101,26 @@ interface Image {
 	path: string;
 }
 
-interface AlbumDetailData {
+interface AlbumDetailState {
 	album: Album;
 	images: Image[];
-	imageGrid: IYogurt<ImageGridData> | null;
-	imageForm: IYogurt<AddImageData> | null;
+	imageGrid: IYogurt<ImageGridState> | null;
+	imageForm: IYogurt<AddImageState> | null;
 }
 
-interface AddImageData {
+interface AddImageState {
 	file: File | null;
 	albumId: number;
 	title: string;
 	description: string;
 }
 
-interface ImageGridData {
+interface ImageGridState {
 	images: Image[];
 	page: number;
 }
 
-interface LoadingModalData {
+interface LoadingModalState {
 	showModal: boolean;
 	text: string;
 }
@@ -138,7 +138,7 @@ interface CommentWithUsername {
 	username: string;
 }
 
-interface ImageDetailData {
+interface ImageDetailState {
 	image: Image;
 	comments: CommentWithUsername[];
 	commentBody: string;
@@ -155,22 +155,21 @@ interface ImageDetailData {
 type Template<T> = (props: T) => string;
 type StyleArray = { name: string; value: string }[];
 type AttrArray = { att: string; value: string }[];
-type Attachments = IYogurt<any>[];
-type Attachment = IYogurt<any>;
+type YogChildren = IYogurt<any>[];
+type YogChild = IYogurt<any>;
 
 interface Options<T> {
 	selector: string;
-	data: T;
+	state: T;
 	template: Template<T>;
-	attachTo?: Attachment | Attachments;
+	childOf?: YogChild | YogChildren;
 }
 
 interface IYogurt<T> {
 	elem: string;
 	template: Template<T>;
-	enabled: boolean;
-	data: T;
-	attach: (attachment: Attachment | Attachments) => void;
-	detach: (attachment: Attachment | Attachments) => void;
+	state: T;
+	attach: (attachment: YogChild | YogChildren) => void;
+	detach: (attachment: YogChild | YogChildren) => void;
 	render: () => void;
 }

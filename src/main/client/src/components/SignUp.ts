@@ -1,6 +1,6 @@
 import Yogurt from '../yogurt';
 
-const data: SignUpData = {
+const state: SignUpState = {
 	username: '',
 	password: '',
 	passwordConfirm: '',
@@ -12,7 +12,7 @@ const data: SignUpData = {
 	genericError: false
 }
 
-const template = (props: SignUpData) => `
+const template = (props: SignUpState) => `
 	<div class="w-full flex justify-center">
 		<div class="w-full md:w-1/2 mt-12 rounded p-4 shadow-xl flex flex-col bg-blue-600">
 			<div class="text-xl border-b-2 border-gray-200 mb-8 p-2 text-gray-200">Sign Up</div>
@@ -35,9 +35,9 @@ const template = (props: SignUpData) => `
 	</div>
 `
 
-const SignUp = new Yogurt<SignUpData>({
+const SignUp = new Yogurt<SignUpState>({
 	selector: '#signup-section',
-	data,
+	state,
 	template,
 });
 

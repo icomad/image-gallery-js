@@ -2,11 +2,11 @@ import Yogurt from '../yogurt';
 import Index from './Index';
 import { contextPath } from '../utils';
 
-const data: IndexNavbarData = {
+const state: IndexNavbarState = {
 	isLogged: false,
 }
 
-const template: Template<IndexNavbarData> = (props) => `
+const template: Template<IndexNavbarState> = (props) => `
 	<nav>
 		<div class="container mx-auto">
 			<div class="w-full flex justify-between items-center">
@@ -24,11 +24,11 @@ const template: Template<IndexNavbarData> = (props) => `
 	</nav>
 `
 
-const IndexNavbar = new Yogurt<IndexNavbarData>({
+const IndexNavbar = new Yogurt<IndexNavbarState>({
 	selector: '#index-navbar',
-	data,
+	state,
 	template,
-	attachTo: Index
+	childOf: Index
 });
 
 export default IndexNavbar;

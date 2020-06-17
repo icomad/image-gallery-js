@@ -1,9 +1,9 @@
 import Yogurt from "../yogurt"
 import App from "./App";
 
-const data: DashboardData = {}
+const state: DashboardState = {}
 
-const template: Template<DashboardData> = (props) => `
+const template: Template<DashboardState> = (props) => `
 	<div class="mt-6 w-full flex justify-center">
 		<div id='add-album-section' class="rounded p-2 shadow-xl flex flex-col justify-start bg-blue-600"></div>
 	</div>
@@ -14,11 +14,11 @@ const template: Template<DashboardData> = (props) => `
 		<section id="album-grid" class="w-full album-grid"></section>
 	</div>
 `
-const Dashboard = new Yogurt<DashboardData>({
+const Dashboard = new Yogurt<DashboardState>({
 	selector: '#dashboard-section',
-	data,
+	state,
 	template,
-	attachTo: App
+	childOf: App
 })
 
 export default Dashboard;

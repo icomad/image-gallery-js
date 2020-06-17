@@ -1,12 +1,12 @@
 import Yogurt from "../yogurt";
 import App from "./App";
 
-const data: LoadingModalData = {
+const state: LoadingModalState = {
 	showModal: false,
 	text: ''
 };
 
-const template: Template<LoadingModalData> = (props) => props.showModal ? `
+const template: Template<LoadingModalState> = (props) => props.showModal ? `
 	<div class='w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50'>
 		<div class='flex justify-center items-center flex-col h-full w-full'>
 			<div class='text-red-800 font-bold text-xl mb-5'>${props.text}</div>
@@ -17,11 +17,11 @@ const template: Template<LoadingModalData> = (props) => props.showModal ? `
 	</div>
 ` : ``;
 
-const LoadingModal = new Yogurt<LoadingModalData>({
+const LoadingModal = new Yogurt<LoadingModalState>({
 	selector: '#loading-modal',
-	data,
+	state,
 	template,
-	attachTo: App
+	childOf: App
 });
 
 export default LoadingModal;

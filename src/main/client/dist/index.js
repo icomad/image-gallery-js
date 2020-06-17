@@ -4,7 +4,7 @@ import IndexNavbar from './components/IndexNavbar';
 import { deleteSuccessAlert, deleteErrorAlert, toggleSignIn, toggleSignUp, indexSignOut, indexGoToDashboard, handleSignInPassword, handleSignInUsername, handleSignUpPasswordConfirm, handleSignUpPassword, handleSignUpEmail, handleSignUpUsername, handleSignUpSubmit, handleSignInSubmit, handleSignInRemember, } from './actions';
 document.addEventListener('DOMContentLoaded', function () {
     if (isLogged()) {
-        IndexNavbar.data.isLogged = true;
+        IndexNavbar.state.isLogged = true;
     }
     document.addEventListener('click', function (event) {
         // ALERTS

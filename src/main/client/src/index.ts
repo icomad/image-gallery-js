@@ -21,7 +21,7 @@ import {
 
 document.addEventListener('DOMContentLoaded', () => {
 	if (isLogged()) {
-		IndexNavbar.data.isLogged = true;
+		IndexNavbar.state.isLogged = true;
 	}
 
 	document.addEventListener('click', (event: Event) => {

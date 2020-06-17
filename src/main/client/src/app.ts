@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		openImage(event);
 	});
 
-	AppNavbar.data.isLogged = true;
+	AppNavbar.state.isLogged = true;
 	App.render();
 	LoadingModal.render();
 	AppNavbar.render();

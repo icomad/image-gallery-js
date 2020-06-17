@@ -1,12 +1,12 @@
 import Yogurt from '../yogurt';
 
-const data: IndexData = {
+const state: IndexState = {
 	showSuccess: false,
 	showError: false,
 	showIndex: true,
 }
 
-const template: Template<IndexData> = (props) => `
+const template: Template<IndexState> = (props) => `
 	<header id="index-navbar" class='header'></header>
 	<main class="bg-gray-100 flex-grow">
 		<div class="container mx-auto p-4">
@@ -30,9 +30,9 @@ const template: Template<IndexData> = (props) => `
 	</main>
 `
 
-const Index = new Yogurt<IndexData>({
+const Index = new Yogurt<IndexState>({
 	selector: '#app',
-	data,
+	state,
 	template
 });
 

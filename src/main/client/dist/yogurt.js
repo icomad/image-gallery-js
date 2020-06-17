@@ -21,65 +21,71 @@ var __spread = (this && this.__spread) || function () {
 var Yogurt = /** @class */ (function () {
     function Yogurt(options) {
         var _this = this;
-        this.enabled = false;
-        this.dynamicAttributes = ['checked', 'selected', 'value'];
-        this.attached = [];
+        /* Component children of this component */
+        this.children = [];
         this.elem = options.selector;
-        this._data = new Proxy(options.data, this.proxyHandler());
+        this._state = new Proxy(options.state, this.proxyHandler());
         this.template = options.template;
-        this.debounce = 0;
-        if (options.attachTo) {
-            var _attachTo = this.trueTypeOf(options.attachTo) === 'array'
-                ? options.attachTo
-                : [options.attachTo];
+        this.efficiency = 0;
+        if (options.childOf) {
+            var _attachTo = this.typeOf(options.childOf) === 'array'
+                ? options.childOf
+                : [options.childOf];
             _attachTo.forEach(function (yogurt) { return ('attach' in yogurt ? yogurt.attach(_this) : false); });
         }
     }
-    Object.defineProperty(Yogurt.prototype, "data", {
+    Object.defineProperty(Yogurt.prototype, "state", {
+        /* Get internal state */
         get: function () {
-            return this._data;
+            return this._state;
         },
-        set: function (newData) {
-            this._data = new Proxy(newData, this.proxyHandler());
-            this.debounceRender();
+        /* If state gets replaced create new proxy  */
+        set: function (newState) {
+            this._state = new Proxy(newState, this.proxyHandler());
+            this.efficientRender();
         },
         enumerable: false,
         configurable: true
     });
-    Yogurt.prototype.attach = function (attachment) {
-        if (this.trueTypeOf(attachment) === 'array')
-            this.attached.concat(attachment);
+    /* Dynamically attach child component to this component */
+    Yogurt.prototype.attach = function (child) {
+        if (this.typeOf(child) === 'array')
+            this.children.concat(child);
         else
-            this.attached.push(attachment);
+            this.children.push(child);
     };
-    Yogurt.prototype.detach = function (attachment) {
-        var isArray = this.trueTypeOf(attachment) === 'array';
-        this.attached = this.attached.filter(function (attachedComponent) {
+    /* Dynamically detach child component of this component  */
+    Yogurt.prototype.detach = function (child) {
+        var isArray = this.typeOf(child) === 'array';
+        this.children = this.children.filter(function (attachedComponent) {
             if (isArray)
-                return attachment.indexOf(attachedComponent) === -1;
+                return child.indexOf(attachedComponent) === -1;
             else
-                return attachedComponent !== attachment;
+                return attachedComponent !== child;
         });
     };
-    Yogurt.prototype.debounceRender = function () {
+    /* Check if component has already a render request */
+    Yogurt.prototype.efficientRender = function () {
         var _this = this;
-        if (this.debounce) {
-            window.cancelAnimationFrame(this.debounce);
+        if (this.efficiency) {
+            window.cancelAnimationFrame(this.efficiency);
         }
-        this.debounce = window.requestAnimationFrame(function () { return _this.render(); });
+        this.efficiency = window.requestAnimationFrame(function () { return _this.render(); });
     };
-    Yogurt.prototype.trueTypeOf = function (obj) {
+    /* Utility function to get user friendly obj type */
+    Yogurt.prototype.typeOf = function (obj) {
         if (obj === undefined)
             return 'undefined';
         if (obj === null)
             return 'null';
         return obj.toString().slice(8, -1).toLowerCase();
     };
+    /* ProxyHandler to request a rerender on prop update */
     Yogurt.prototype.proxyHandler = function () {
         var _this = this;
         return {
             get: function (obj, prop) {
-                if (['object', 'array'].indexOf(_this.trueTypeOf(obj[prop])) > -1) {
+                if (['object', 'array'].indexOf(_this.typeOf(obj[prop])) > -1) {
                     return new Proxy(obj[prop], _this.proxyHandler());
                 }
                 return obj[prop];
@@ -88,21 +94,23 @@ var Yogurt = /** @class */ (function () {
                 if (obj[prop] === value)
                     return true;
                 obj[prop] = value;
-                _this.debounceRender();
+                _this.efficientRender();
                 return true;
             },
             deleteProperty: function (obj, prop) {
                 delete obj[prop];
-                _this.debounceRender();
+                _this.efficientRender();
                 return true;
             },
         };
     };
-    Yogurt.prototype.stringToHTML = function (template) {
+    /* Generate DOM elements bases on string */
+    Yogurt.prototype.stringComponent = function (template) {
         var parser = new DOMParser();
         var doc = parser.parseFromString(template, 'text/html');
         return doc.body;
     };
+    /* Utility function to get user friendly html5 node type */
     Yogurt.prototype.getNodeType = function (node) {
         if (node.nodeType === 3)
             return 'text';
@@ -110,11 +118,13 @@ var Yogurt = /** @class */ (function () {
             return 'comment';
         return node.tagName.toLowerCase();
     };
+    /* Utility function to get user friendly html5 node content */
     Yogurt.prototype.getNodeContent = function (node) {
         if (node.childNodes && node.childNodes.length > 0)
             return null;
         return node.textContent;
     };
+    /* Utility function to get a map of all the inline styles applied to html5 node */
     Yogurt.prototype.getStyleMap = function (styles) {
         return styles.split(';').reduce(function (arr, style) {
             var col = style.indexOf(':');
@@ -127,14 +137,17 @@ var Yogurt = /** @class */ (function () {
             return arr;
         }, []);
     };
+    /* Utility function to remove specific inline styles applied to html5 node */
     Yogurt.prototype.removeStyles = function (elem, styles) {
         //@ts-ignore
         styles.forEach(function (style) { return (elem.style[style] = ''); });
     };
+    /* Utility function to update specific inline styles value */
     Yogurt.prototype.changeStyles = function (elem, styles) {
         //@ts-ignore
         styles.forEach(function (style) { return (elem.style[style.name] = style.value); });
     };
+    /* Utility function to compare old and new style property and update accordingly */
     Yogurt.prototype.diffStyles = function (elem, styles) {
         var styleMap = this.getStyleMap(styles);
         var remove = __spread(elem.style).filter(function (style) {
@@ -144,6 +157,7 @@ var Yogurt = /** @class */ (function () {
         this.removeStyles(elem, remove);
         this.changeStyles(elem, styleMap);
     };
+    /* Utility function to add attributes to html5 node */
     Yogurt.prototype.addAttributes = function (elem, atts) {
         var _this = this;
         atts.forEach(function (attribute) {
@@ -173,6 +187,7 @@ var Yogurt = /** @class */ (function () {
             }
         });
     };
+    /* Utility function to remove attributes from html5 node */
     Yogurt.prototype.removeAttributes = function (elem, atts) {
         var _this = this;
         atts.forEach(function (attribute) {
@@ -197,9 +212,10 @@ var Yogurt = /** @class */ (function () {
             }
         });
     };
+    /* Utility function to check if attribute is one of 'checked' or 'value' and get it */
     Yogurt.prototype.getDynamicAttributes = function (node, atts, isTemplate) {
         var _this = this;
-        this.dynamicAttributes.forEach(function (prop) {
+        ['checked', 'value'].forEach(function (prop) {
             if (
             //@ts-ignore
             (!node[prop] && node[prop] !== 0) ||
@@ -210,22 +226,25 @@ var Yogurt = /** @class */ (function () {
             atts.push(_this.getAttribute(prop, node[prop]));
         });
     };
+    /* Utility function to get attributes of html5 node except for 'value' and 'checked' */
     Yogurt.prototype.getBaseAttributes = function (node, isTemplate) {
         var _this = this;
         return __spread(node.attributes).reduce(function (arr, attribute) {
-            if ((_this.dynamicAttributes.indexOf(attribute.name) < 0 || (isTemplate && attribute.name === 'selected')) &&
+            if ((['checked', 'value'].indexOf(attribute.name) < 0 || (isTemplate && attribute.name === 'selected')) &&
                 (attribute.name.length > 7 ? attribute.name.slice(0, 7) !== 'default' : true)) {
                 arr.push(_this.getAttribute(attribute.name, attribute.value));
             }
             return arr;
         }, []);
     };
+    /* Utility function to create custom obj with name and value of an attribute of a html5 node */
     Yogurt.prototype.getAttribute = function (name, value) {
         return {
             att: name,
             value: value,
         };
     };
+    /* Utility function to return all attributes of a html5 node */
     Yogurt.prototype.getAttributes = function (node, isTemplate) {
         if (node.nodeType !== 1)
             return [];
@@ -233,12 +252,12 @@ var Yogurt = /** @class */ (function () {
         this.getDynamicAttributes(node, atts, isTemplate);
         return atts;
     };
+    /* Utility function to compare old and new attributes properties and update accordingly */
     Yogurt.prototype.diffAtts = function (template, elem) {
-        var _this = this;
         var templateAtts = this.getAttributes(template, true);
         var elemAtts = this.getAttributes(elem, false);
         var remove = elemAtts.filter(function (att) {
-            if (_this.dynamicAttributes.indexOf(att.att) > -1)
+            if (['checked', 'value'].indexOf(att.att) > -1)
                 return false;
             var getAtt = templateAtts.find(function (newAtt) { return att.att === newAtt.att; });
             return getAtt === undefined;
@@ -250,21 +269,8 @@ var Yogurt = /** @class */ (function () {
         this.addAttributes(elem, change);
         this.removeAttributes(elem, remove);
     };
-    Yogurt.prototype.addDefaultAtts = function (node) {
-        var _this = this;
-        if (node.nodeType !== 1)
-            return;
-        __spread(node.attributes).forEach(function (attribute) {
-            if (attribute.name.length < 8 || attribute.name.slice(0, 7) !== 'default')
-                return;
-            _this.addAttributes(node, [_this.getAttribute(attribute.name.slice(7).toLowerCase(), attribute.value)]);
-            _this.removeAttributes(node, [_this.getAttribute(attribute.name, attribute.value)]);
-        });
-        if (node.childNodes) {
-            __spread(node.childNodes).forEach(function (childNode) { return _this.addDefaultAtts(childNode); });
-        }
-    };
-    Yogurt.prototype.diffingDOM = function (template, elem, attachments) {
+    /* Utility function to update only elements of DOM tree that have changed their attributes or content */
+    Yogurt.prototype.diffingDOM = function (template, elem, children) {
         var _this = this;
         var domNodes = __spread(elem.childNodes).slice();
         var templateNodes = __spread(template.childNodes).slice();
@@ -276,7 +282,6 @@ var Yogurt = /** @class */ (function () {
         }
         templateNodes.forEach(function (node, index) {
             if (!domNodes[index]) {
-                _this.addDefaultAtts(node);
                 elem.appendChild(node.cloneNode(true));
                 return;
             }
@@ -285,8 +290,8 @@ var Yogurt = /** @class */ (function () {
                 return;
             }
             _this.diffAtts(node, domNodes[index]);
-            var isAttachment = attachments.filter(function (attachment) { return node.nodeType !== 3 && node.matches(attachment); });
-            if (isAttachment.length > 0)
+            var isChild = children.filter(function (cihld) { return node.nodeType !== 3 && node.matches(cihld); });
+            if (isChild.length > 0)
                 return;
             var templateContent = _this.getNodeContent(node);
             if (templateContent && templateContent !== _this.getNodeContent(domNodes[index])) {
@@ -298,30 +303,32 @@ var Yogurt = /** @class */ (function () {
             }
             if (domNodes[index].childNodes.length < 1 && node.childNodes.length > 0) {
                 var fragment = document.createDocumentFragment();
-                _this.diffingDOM(node, fragment, attachments);
+                _this.diffingDOM(node, fragment, children);
                 domNodes[index].appendChild(fragment);
                 return;
             }
             if (node.childNodes.length > 0) {
-                _this.diffingDOM(node, domNodes[index], attachments);
+                _this.diffingDOM(node, domNodes[index], children);
             }
         });
     };
-    Yogurt.prototype.renderAttachments = function (attachments) {
-        if (!attachments)
+    /* Call the render method on all children attached to this component  */
+    Yogurt.prototype.renderChildren = function (children) {
+        if (!children)
             return;
-        attachments.forEach(function (yogurt) {
+        children.forEach(function (yogurt) {
             if ('render' in yogurt)
                 yogurt.render();
         });
     };
+    /* Render the component using DOM diffing and emit a 'render' event at the end */
     Yogurt.prototype.render = function () {
         var node = document.querySelector(this.elem);
-        var templateHTML = this.stringToHTML(this.template(this._data));
-        var attachments = this.attached.map(function (attachment) { return attachment.elem; });
-        this.diffingDOM(templateHTML, node, attachments);
-        node.dispatchEvent(new CustomEvent('render', { bubbles: true, detail: this._data }));
-        this.renderAttachments(this.attached);
+        var templateHTML = this.stringComponent(this.template(this._state));
+        var childrenElem = this.children.map(function (child) { return child.elem; });
+        this.diffingDOM(templateHTML, node, childrenElem);
+        node.dispatchEvent(new CustomEvent('render', { bubbles: true, detail: this._state }));
+        this.renderChildren(this.children);
     };
     return Yogurt;
 }());
